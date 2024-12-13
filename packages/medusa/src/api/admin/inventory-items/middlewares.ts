@@ -7,6 +7,7 @@ import { DEFAULT_BATCH_ENDPOINTS_SIZE_LIMIT } from "../../../utils/middlewares"
 import { createBatchBody } from "../../utils/validators"
 import * as QueryConfig from "./query-config"
 import {
+  AdminBatchInventoryItemLevels,
   AdminCreateInventoryItem,
   AdminCreateInventoryLocationLevel,
   AdminGetInventoryItemParams,
@@ -48,6 +49,22 @@ export const adminInventoryRoutesMiddlewares: MiddlewareRoute[] = [
         QueryConfig.retrieveTransformQueryConfig
       ),
     ],
+  },
+  {
+    method: ["POST"],
+    matcher: "/admin/inventory-items/batch",
+    bodyParser: {
+      sizeLimit: DEFAULT_BATCH_ENDPOINTS_SIZE_LIMIT,
+    },
+    middlewares: [validateAndTransformBody(AdminBatchInventoryItemLevels)],
+  },
+  {
+    method: ["POST"],
+    matcher: "/admin/inventory-items/location-levels/batch",
+    bodyParser: {
+      sizeLimit: DEFAULT_BATCH_ENDPOINTS_SIZE_LIMIT,
+    },
+    middlewares: [validateAndTransformBody(AdminBatchInventoryItemLevels)],
   },
   {
     method: ["POST"],

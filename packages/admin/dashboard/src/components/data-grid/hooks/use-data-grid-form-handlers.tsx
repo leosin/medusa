@@ -1,3 +1,4 @@
+import set from "lodash/set"
 import { useCallback } from "react"
 import { FieldValues, Path, PathValue, UseFormReturn } from "react-hook-form"
 
@@ -12,13 +13,13 @@ type UseDataGridFormHandlersOptions<TData, TFieldValues extends FieldValues> = {
 
 export const useDataGridFormHandlers = <
   TData,
-  TFieldValues extends FieldValues,
+  TFieldValues extends FieldValues
 >({
   matrix,
   form,
   anchor,
 }: UseDataGridFormHandlersOptions<TData, TFieldValues>) => {
-  const { getValues, setValue } = form
+  const { getValues, reset } = form
 
   const getSelectionValues = useCallback(
     (fields: string[]): PathValue<TFieldValues, Path<TFieldValues>>[] => {
@@ -26,9 +27,10 @@ export const useDataGridFormHandlers = <
         return []
       }
 
+      const allValues = getValues()
       return fields.map((field) => {
-        return getValues(field as Path<TFieldValues>)
-      })
+        return field.split(".").reduce((obj, key) => obj?.[key], allValues)
+      }) as PathValue<TFieldValues, Path<TFieldValues>>[]
     },
     [getValues]
   )
@@ -40,12 +42,12 @@ export const useDataGridFormHandlers = <
       }
 
       const type = matrix.getCellType(anchor)
-
       if (!type) {
         return
       }
 
       const convertedValues = convertArrayToPrimitive(values, type)
+      const currentValues = getValues()
 
       fields.forEach((field, index) => {
         if (!field) {
@@ -53,18 +55,18 @@ export const useDataGridFormHandlers = <
         }
 
         const valueIndex = index % values.length
-        const value = convertedValues[valueIndex] as PathValue<
-          TFieldValues,
-          Path<TFieldValues>
-        >
+        const value = convertedValues[valueIndex]
 
-        setValue(field as Path<TFieldValues>, value, {
-          shouldDirty: true,
-          shouldTouch: true,
-        })
+        set(currentValues, field, value)
+      })
+
+      reset(currentValues, {
+        keepDirty: true,
+        keepTouched: true,
+        keepDefaultValues: true,
       })
     },
-    [matrix, anchor, setValue]
+    [matrix, anchor, getValues, reset]
   )
 
   return {
@@ -119,7 +121,17 @@ export function convertArrayToPrimitive(
 ): any[] {
   switch (type) {
     case "number":
-      return values.map((v) => (v === "" ? v : convertToNumber(v)))
+      return values.map((v) => {
+        if (v === "") {
+          return v
+        }
+
+        if (v == null) {
+          return ""
+        }
+
+        return convertToNumber(v)
+      })
     case "boolean":
       return values.map(convertToBoolean)
     case "text":

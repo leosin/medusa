@@ -603,16 +603,13 @@ export default class InventoryModuleService
       return acc
     }, new Map())
 
-    return await this.inventoryLevelService_.update(
-      updates.map((update) => {
-        const id = levelMap
-          .get(update.inventory_item_id)
-          .get(update.location_id)
+    const updatesWithIds = updates.map((update) => {
+      const id = levelMap.get(update.inventory_item_id).get(update.location_id)
 
-        return { id, ...update }
-      }),
-      context
-    )
+      return { id, ...update }
+    })
+
+    return await this.inventoryLevelService_.update(updatesWithIds, context)
   }
 
   /**

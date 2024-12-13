@@ -30,6 +30,14 @@ export interface UpdateInventoryLevelInput {
    */
   id?: string
   /**
+   * The ID of the associated inventory item.
+   */
+  inventory_item_id: string
+  /**
+   * The ID of the associated location.
+   */
+  location_id: string
+  /**
    * The stocked quantity of the associated inventory item in the associated location.
    */
   stocked_quantity?: number

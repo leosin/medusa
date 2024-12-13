@@ -129,3 +129,20 @@ export const AdminUpdateInventoryItem = z
     metadata: z.record(z.unknown()).nullish(),
   })
   .strict()
+
+const AdminBatchInventoryLocationLevel = z.object({
+  inventory_item_id: z.string(),
+  location_id: z.string(),
+  stocked_quantity: z.number().min(0).optional(),
+  incoming_quantity: z.number().min(0).optional(),
+})
+
+export const AdminBatchInventoryItemLevels = z.object({
+  create: z.array(AdminBatchInventoryLocationLevel).optional(),
+  update: z.array(AdminBatchInventoryLocationLevel).optional(),
+  delete: z.array(z.string()).optional(),
+})
+
+export type AdminBatchInventoryItemLevelsType = z.infer<
+  typeof AdminBatchInventoryItemLevels
+>

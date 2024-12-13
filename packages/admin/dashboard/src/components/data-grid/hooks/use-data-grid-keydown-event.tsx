@@ -1,4 +1,4 @@
-import { useCallback } from "react"
+import React, { useCallback } from "react"
 import type {
   FieldValues,
   Path,
@@ -39,6 +39,7 @@ type UseDataGridKeydownEventOptions<TData, TFieldValues extends FieldValues> = {
   ) => PathValue<TFieldValues, Path<TFieldValues>>[]
   setSelectionValues: (fields: string[], values: string[]) => void
   restoreSnapshot: () => void
+  createSnapshot: (coords: DataGridCoordinates) => void
 }
 
 const ARROW_KEYS = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"]
@@ -67,6 +68,7 @@ export const useDataGridKeydownEvent = <
   getSelectionValues,
   setSelectionValues,
   restoreSnapshot,
+  createSnapshot,
 }: UseDataGridKeydownEventOptions<TData, TFieldValues>) => {
   const handleKeyboardNavigation = useCallback(
     (e: KeyboardEvent) => {
@@ -218,6 +220,8 @@ export const useDataGridKeydownEvent = <
         return
       }
 
+      createSnapshot(anchor)
+
       const current = getValues(field as Path<TFieldValues>)
       const next = ""
 
@@ -236,7 +240,39 @@ export const useDataGridKeydownEvent = <
 
       input.focus()
     },
-    [matrix, queryTool, getValues, execute, setValue]
+    [matrix, queryTool, getValues, execute, setValue, createSnapshot]
+  )
+
+  const handleSpaceKeyTogglableNumber = useCallback(
+    (anchor: DataGridCoordinates) => {
+      const field = matrix.getCellField(anchor)
+      const input = queryTool?.getInput(anchor)
+
+      if (!field || !input) {
+        return
+      }
+
+      createSnapshot(anchor)
+
+      const current = getValues(field as Path<TFieldValues>)
+      const next = { ...current, quantity: "" }
+
+      const command = new DataGridUpdateCommand({
+        next,
+        prev: current,
+        setter: (value) => {
+          setValue(field as Path<TFieldValues>, value, {
+            shouldDirty: true,
+            shouldTouch: true,
+          })
+        },
+      })
+
+      execute(command)
+
+      input.focus()
+    },
+    [matrix, queryTool, getValues, execute, setValue, createSnapshot]
   )
 
   const handleSpaceKey = useCallback(
@@ -257,6 +293,9 @@ export const useDataGridKeydownEvent = <
         case "boolean":
           handleSpaceKeyBoolean(anchor)
           break
+        case "togglable-number":
+          handleSpaceKeyTogglableNumber(anchor)
+          break
         case "number":
         case "text":
           handleSpaceKeyTextOrNumber(anchor)
@@ -269,6 +308,7 @@ export const useDataGridKeydownEvent = <
       matrix,
       handleSpaceKeyBoolean,
       handleSpaceKeyTextOrNumber,
+      handleSpaceKeyTogglableNumber,
     ]
   )
 
@@ -390,6 +430,7 @@ export const useDataGridKeydownEvent = <
       const type = matrix.getCellType(anchor)
 
       switch (type) {
+        case "togglable-number":
         case "text":
         case "number":
           handleEnterKeyTextOrNumber(e, anchor)
@@ -518,7 +559,7 @@ export const useDataGridKeydownEvent = <
           break
       }
     },
-    [anchor, isEditing, setTrapActive, containerRef]
+    [isEditing, setTrapActive, containerRef]
   )
 
   const handleKeyDownEvent = useCallback(

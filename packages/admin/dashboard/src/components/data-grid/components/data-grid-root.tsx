@@ -50,7 +50,7 @@ import { isCellMatch, isSpecialFocusKey } from "../utils"
 import { DataGridKeyboardShortcutModal } from "./data-grid-keyboard-shortcut-modal"
 export interface DataGridRootProps<
   TData,
-  TFieldValues extends FieldValues = FieldValues,
+  TFieldValues extends FieldValues = FieldValues
 > {
   data?: TData[]
   columns: ColumnDef<TData>[]
@@ -90,13 +90,12 @@ const getCommonPinningStyles = <TData,>(
 
 /**
  * TODO:
- * - [Minor] Add shortcuts overview modal.
  * - [Minor] Extend the commands to also support modifying the anchor and rangeEnd, to restore the previous focus after undo/redo.
  */
 
 export const DataGridRoot = <
   TData,
-  TFieldValues extends FieldValues = FieldValues,
+  TFieldValues extends FieldValues = FieldValues
 >({
   data = [],
   columns,
@@ -333,6 +332,7 @@ export const DataGridRoot = <
       setSelectionValues,
       onEditingChangeHandler,
       restoreSnapshot,
+      createSnapshot,
       setSingleRange,
       scrollToCoordinates,
       execute,

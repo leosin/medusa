@@ -1,3 +1,4 @@
+import { FetchError } from "@medusajs/js-sdk"
 import { HttpTypes } from "@medusajs/types"
 import {
   QueryKey,
@@ -6,11 +7,11 @@ import {
   useMutation,
   useQuery,
 } from "@tanstack/react-query"
-import { FetchError } from "@medusajs/js-sdk"
 
 import { sdk } from "../../lib/client"
 import { queryClient } from "../../lib/query-client"
 import { queryKeysFactory } from "../../lib/query-key-factory"
+import { variantsQueryKeys } from "./products"
 
 const INVENTORY_ITEMS_QUERY_KEY = "inventory_items" as const
 export const inventoryItemsQueryKeys = queryKeysFactory(
@@ -23,7 +24,7 @@ export const inventoryItemLevelsQueryKeys = queryKeysFactory(
 )
 
 export const useInventoryItems = (
-  query?: Record<string, any>,
+  query?: HttpTypes.AdminInventoryItemParams,
   options?: Omit<
     UseQueryOptions<
       HttpTypes.AdminInventoryItemListResponse,
@@ -136,7 +137,7 @@ export const useDeleteInventoryItemLevel = (
   inventoryItemId: string,
   locationId: string,
   options?: UseMutationOptions<
-    HttpTypes.AdminInventoryItemDeleteResponse,
+    HttpTypes.AdminInventoryLevelDeleteResponse,
     FetchError,
     void
   >
@@ -230,6 +231,29 @@ export const useBatchUpdateInventoryLevels = (
       })
       queryClient.invalidateQueries({
         queryKey: inventoryItemLevelsQueryKeys.detail(inventoryItemId),
+      })
+      options?.onSuccess?.(data, variables, context)
+    },
+    ...options,
+  })
+}
+
+export const useBatchInventoryLevels = (
+  options?: UseMutationOptions<
+    HttpTypes.AdminInventoryItemResponse,
+    FetchError,
+    HttpTypes.AdminBatchInventoryItemLevels
+  >
+) => {
+  return useMutation({
+    mutationFn: (payload: HttpTypes.AdminBatchInventoryItemLevels) =>
+      sdk.admin.inventoryItem._batchUpdateLevels(payload),
+    onSuccess: (data, variables, context) => {
+      queryClient.invalidateQueries({
+        queryKey: inventoryItemsQueryKeys.all,
+      })
+      queryClient.invalidateQueries({
+        queryKey: variantsQueryKeys.lists(),
       })
       options?.onSuccess?.(data, variables, context)
     },

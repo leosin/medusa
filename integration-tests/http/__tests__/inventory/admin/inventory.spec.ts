@@ -12,7 +12,7 @@ medusaIntegrationTestRunner({
     let inventoryItem2
     let stockLocation1
     let stockLocation2
-
+    let stockLocation3
     beforeEach(async () => {
       await createAdminUser(dbConnection, adminHeaders, getContainer())
 
@@ -22,6 +22,10 @@ medusaIntegrationTestRunner({
 
       stockLocation2 = (
         await api.post(`/admin/stock-locations`, { name: "loc2" }, adminHeaders)
+      ).data.stock_location
+
+      stockLocation3 = (
+        await api.post(`/admin/stock-locations`, { name: "loc3" }, adminHeaders)
       ).data.stock_location
 
       inventoryItem1 = (
@@ -119,6 +123,69 @@ medusaIntegrationTestRunner({
               }),
             ])
           )
+        })
+      })
+
+      describe("POST /admin/inventory-items/location-levels/batch", () => {
+        beforeEach(async () => {
+          await api.post(
+            `/admin/inventory-items/${inventoryItem1.id}/location-levels`,
+            {
+              location_id: stockLocation1.id,
+              stocked_quantity: 0,
+            },
+            adminHeaders
+          )
+
+          await api.post(
+            `/admin/inventory-items/${inventoryItem1.id}/location-levels`,
+            {
+              location_id: stockLocation2.id,
+              stocked_quantity: 10,
+            },
+            adminHeaders
+          )
+        })
+
+        it("should batch update the inventory levels", async () => {
+          const result = await api.post(
+            `/admin/inventory-items/location-levels/batch`,
+            {
+              update: [
+                {
+                  location_id: stockLocation1.id,
+                  inventory_item_id: inventoryItem1.id,
+                  stocked_quantity: 10,
+                },
+                {
+                  location_id: stockLocation2.id,
+                  inventory_item_id: inventoryItem1.id,
+                  stocked_quantity: 20,
+                },
+              ],
+            },
+            adminHeaders
+          )
+
+          expect(result.status).toEqual(200)
+        })
+
+        it("should batch create the inventory levels", async () => {
+          const result = await api.post(
+            `/admin/inventory-items/location-levels/batch`,
+            {
+              create: [
+                {
+                  location_id: stockLocation3.id,
+                  inventory_item_id: inventoryItem1.id,
+                  stocked_quantity: 10,
+                },
+              ],
+            },
+            adminHeaders
+          )
+
+          expect(result.status).toEqual(200)
         })
       })
 
