@@ -369,10 +369,10 @@ export class InventoryItem {
    *     location_id: "sloc_123",
    *     stocked_quantity: 10
    *   }],
-   *   delete: ["sloc_123"]
+   *   delete: ["ilvl_123"]
    * })
-   * .then(({ inventory_item }) => {
-   *   console.log(inventory_item)
+   * .then(({ created, updated, deleted }) => {
+   *   console.log(created, updated, deleted)
    * })
    */
   async batchUpdateLevels(
@@ -381,7 +381,7 @@ export class InventoryItem {
     query?: SelectParams,
     headers?: ClientHeaders
   ) {
-    return await this.client.fetch<HttpTypes.AdminInventoryItemResponse>(
+    return await this.client.fetch<HttpTypes.AdminBatchInventoryItemLocationLevelsResponse>(
       `/admin/inventory-items/${id}/location-levels/batch`,
       {
         method: "POST",
@@ -398,8 +398,7 @@ export class InventoryItem {
    * API route.
    *
    * @param id - The inventory item's ID.
-   * @param body - The inventory levels to create, update or delete.
-   * @param query - Configure the fields to retrieve in the inventory item.
+   * @param body - The inventory levels to create, update or delete, and an optional `force` flag.
    * @param headers - Headers to pass in the request
    * @returns The inventory item's details.
    *
@@ -411,23 +410,21 @@ export class InventoryItem {
    *   }],
    *   delete: ["ilvl_123"]
    * })
-   * .then(({ inventory_item }) => {
-   *   console.log(inventory_item)
+   * .then(({ created, updated, deleted }) => {
+   *   console.log(created, updated, deleted)
    * })
    */
   async batchInventoryItemLocationLevels(
     id: string,
     body: HttpTypes.AdminBatchInventoryItemLocationLevels,
-    query?: SelectParams,
     headers?: ClientHeaders
   ) {
-    return await this.client.fetch<HttpTypes.AdminInventoryItemResponse>(
+    return await this.client.fetch<HttpTypes.AdminBatchInventoryItemLocationLevelsResponse>(
       `/admin/inventory-items/${id}/location-levels/batch`,
       {
         method: "POST",
         headers,
         body,
-        query,
       }
     )
   }
@@ -435,8 +432,7 @@ export class InventoryItem {
   /**
    * This method manages the inventory levels of multiple inventory items.
    *
-   * @param body - The inventory levels to create, update or delete.
-   * @param query - Configure the fields to retrieve in the inventory item.
+   * @param body - The inventory levels to create, update or delete, and an optional `force` flag.
    * @param headers - Headers to pass in the request
    * @returns The inventory item's details.
    *
@@ -449,15 +445,15 @@ export class InventoryItem {
    *   }],
    *   delete: ["ilvl_123"]
    * })
-   * .then(({ inventory_item }) => {
-   *   console.log(inventory_item)
+   * .then(({ created, updated, deleted }) => {
+   *   console.log(created, updated, deleted)
    * })
    */
   async batchInventoryItemsLocationLevels(
     body: HttpTypes.AdminBatchInventoryItemsLocationLevels,
     headers?: ClientHeaders
   ) {
-    return await this.client.fetch<HttpTypes.AdminInventoryItemResponse>(
+    return await this.client.fetch<HttpTypes.AdminBatchInventoryItemsLocationLevelsResponse>(
       `/admin/inventory-items/location-levels/batch`,
       {
         method: "POST",

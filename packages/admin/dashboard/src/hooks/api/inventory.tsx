@@ -214,7 +214,7 @@ export const useUpdateInventoryLevel = (
 export const useBatchInventoryItemLocationLevels = (
   inventoryItemId: string,
   options?: UseMutationOptions<
-    HttpTypes.AdminInventoryItemResponse,
+    HttpTypes.AdminBatchInventoryItemLocationLevelsResponse,
     FetchError,
     HttpTypes.AdminBatchInventoryItemLocationLevels
   >
@@ -243,7 +243,7 @@ export const useBatchInventoryItemLocationLevels = (
 
 export const useBatchInventoryItemsLocationLevels = (
   options?: UseMutationOptions<
-    HttpTypes.AdminInventoryItemResponse,
+    HttpTypes.AdminBatchInventoryItemsLocationLevelsResponse,
     FetchError,
     HttpTypes.AdminBatchInventoryItemsLocationLevels
   >
