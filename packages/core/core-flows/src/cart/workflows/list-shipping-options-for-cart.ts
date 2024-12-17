@@ -7,6 +7,7 @@ import {
 } from "@medusajs/framework/workflows-sdk"
 import { useQueryGraphStep, validatePresenceOfStep } from "../../common"
 import { useRemoteQueryStep } from "../../common/steps/use-remote-query"
+import { cartFieldsForPricingContext } from "../utils/fields"
 
 export const listShippingOptionsForCartWorkflowId =
   "list-shipping-options-for-cart"
@@ -26,18 +27,7 @@ export const listShippingOptionsForCartWorkflow = createWorkflow(
     const cartQuery = useQueryGraphStep({
       entity: "cart",
       filters: { id: input.cart_id },
-      fields: [
-        "id",
-        "sales_channel_id",
-        "currency_code",
-        "region_id",
-        "shipping_address.city",
-        "shipping_address.country_code",
-        "shipping_address.province",
-        "shipping_address.postal_code",
-        "item_total",
-        "total",
-      ],
+      fields: cartFieldsForPricingContext,
       options: { throwIfKeyNotFound: true },
     }).config({ name: "get-cart" })
 
