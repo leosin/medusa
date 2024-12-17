@@ -1,5 +1,30 @@
 import { isDefined } from "./is-defined"
 
+/*
+  Given an array of keys that are object paths (like product.categories.id), this function will
+  return an object that contains keys from those object paths
+
+  Given an object: testObject = {
+    product: {
+      id: "test-product",
+      name: "Test Product",
+      categories: [{
+        id: "test-category",
+        name: "Test Category"
+      }]
+    }
+  }
+
+  filterObjectByKeys(testObject, ['product.categories.id']) will return
+
+  {
+    product: {
+      categories: [{
+        id: "test-category"
+      }]
+    }
+  }
+*/
 export function filterObjectByKeys(obj, paths) {
   function buildObject(paths) {
     const result = {}
