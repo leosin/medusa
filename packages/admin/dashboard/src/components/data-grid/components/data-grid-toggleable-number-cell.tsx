@@ -137,7 +137,7 @@ const Inner = ({
     _name,
     _values
   ) => {
-    const ensuredValue = updatedValue || ""
+    const ensuredValue = updatedValue !== undefined ? updatedValue : ""
     const newValue = { ...localValue, quantity: ensuredValue }
 
     /**
@@ -158,7 +158,7 @@ const Inner = ({
         {...props}
         ref={combinedRefs}
         className="txt-compact-small w-full flex-1 cursor-default appearance-none bg-transparent pl-8 text-right outline-none"
-        value={localValue?.quantity || undefined}
+        value={localValue?.quantity}
         onValueChange={handleInputChange}
         formatValueOnBlur
         onBlur={() => {

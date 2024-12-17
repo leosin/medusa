@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next"
 import { useSearchParams } from "react-router-dom"
 import { RouteFocusModal } from "../../../components/modals"
 import { useInventoryItems, useStockLocations } from "../../../hooks/api"
@@ -5,6 +6,7 @@ import { INVENTORY_ITEM_IDS_KEY } from "../common/constants"
 import { InventoryStockForm } from "./components/inventory-stock-form"
 
 export const InventoryStock = () => {
+  const { t } = useTranslation()
   const [searchParams] = useSearchParams()
   const inventoryItemIds =
     searchParams.get(INVENTORY_ITEM_IDS_KEY)?.split(",") || undefined
@@ -39,6 +41,12 @@ export const InventoryStock = () => {
 
   return (
     <RouteFocusModal>
+      <RouteFocusModal.Title asChild>
+        <span className="sr-only">{t("inventory.stock.title")}</span>
+      </RouteFocusModal.Title>
+      <RouteFocusModal.Description asChild>
+        <span className="sr-only">{t("inventory.stock.description")}</span>
+      </RouteFocusModal.Description>
       {ready && (
         <InventoryStockForm
           items={inventory_items}

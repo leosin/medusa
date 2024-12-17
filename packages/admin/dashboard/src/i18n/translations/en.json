@@ -652,7 +652,8 @@
       "tooltips": {
         "alreadyManaged": "This inventory item is already editable under {{title}}.",
         "alreadyManagedWithSku": "This inventory item is already editable under {{title}} ({{sku}})."
-      }
+      },
+      "successToast": "Inventory levels updated successfully."
     },
     "toasts": {
       "delete": {
@@ -808,6 +809,12 @@
       "updateLocations": "Locations updated successfully.",
       "updateLevel": "Inventory level updated successfully.",
       "updateItem": "Inventory item updated successfully."
+    },
+    "stock": {
+      "title": "Update inventory levels",
+      "description": "Update the stocked inventory levels for the selected inventory items.",
+      "action": "Edit stock levels",
+      "successToast": "Inventory levels updated successfully."
     }
   },
   "giftCards": {

@@ -95,7 +95,7 @@ export const InventoryListTable = () => {
                 )}`
               )
             },
-            label: t("actions.edit"),
+            label: t("inventory.stock.action"),
             shortcut: "i",
           },
         ]}

@@ -4,6 +4,7 @@ const LocationQuantitySchema = z.object({
   id: z.string().optional(),
   quantity: z.union([z.number(), z.string()]),
   checked: z.boolean(),
+  disabledToggle: z.boolean(),
 })
 
 const InventoryLocationsSchema = z.record(LocationQuantitySchema)

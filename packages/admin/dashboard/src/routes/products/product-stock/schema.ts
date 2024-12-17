@@ -1,7 +1,7 @@
 import { z } from "zod"
 
 const LocationQuantitySchema = z.object({
-  levels_id: z.string().optional(),
+  id: z.string().optional(),
   quantity: z.union([z.number(), z.string()]),
   checked: z.boolean(),
   disabledToggle: z.boolean(),

@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { HttpTypes } from "@medusajs/types"
-import { Button } from "@medusajs/ui"
+import { Button, toast } from "@medusajs/ui"
+import { useRef } from "react"
 import { DefaultValues, useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 import { DataGrid } from "../../../../../components/data-grid"
@@ -9,6 +10,8 @@ import {
   useRouteModal,
 } from "../../../../../components/modals"
 import { KeyboundForm } from "../../../../../components/utilities/keybound-form"
+import { useBatchInventoryItemsLocationLevels } from "../../../../../hooks/api"
+import { castNumber } from "../../../../../lib/cast-number"
 import { useInventoryStockColumns } from "../../hooks/use-inventory-stock-columns"
 import {
   InventoryItemSchema,
@@ -26,7 +29,10 @@ export const InventoryStockForm = ({
   locations,
 }: InventoryStockFormProps) => {
   const { t } = useTranslation()
-  const { setCloseOnEscape } = useRouteModal()
+  const { setCloseOnEscape, handleSuccess } = useRouteModal()
+
+  const initialValues = useRef(getDefaultValues(items, locations))
+  console.log("initialValues", initialValues.current)
 
   const form = useForm<InventoryStockSchema>({
     defaultValues: getDefaultValues(items, locations),
@@ -35,9 +41,69 @@ export const InventoryStockForm = ({
 
   const columns = useInventoryStockColumns(locations)
 
+  const { mutateAsync, isPending } = useBatchInventoryItemsLocationLevels()
+
+  const onSubmit = form.handleSubmit(async (data) => {
+    const payload: HttpTypes.AdminBatchInventoryItemsLocationLevels = {
+      create: [],
+      update: [],
+      delete: [],
+      force: true,
+    }
+
+    for (const [inventory_item_id, item] of Object.entries(
+      data.inventory_items
+    )) {
+      for (const [location_id, level] of Object.entries(item.locations)) {
+        if (level.id) {
+          const wasChecked =
+            initialValues.current?.inventory_items?.[inventory_item_id]
+              ?.locations?.[location_id]?.checked
+
+          if (wasChecked && !level.checked) {
+            payload.delete.push(level.id)
+          } else {
+            const newQuantity =
+              level.quantity !== "" ? castNumber(level.quantity) : 0
+            const originalQuantity =
+              initialValues.current?.inventory_items?.[inventory_item_id]
+                ?.locations?.[location_id]?.quantity
+
+            if (newQuantity !== originalQuantity) {
+              payload.update.push({
+                id: level.id,
+                inventory_item_id,
+                location_id,
+                stocked_quantity: newQuantity,
+              })
+            }
+          }
+        }
+
+        if (!level.id && level.quantity !== "") {
+          payload.create.push({
+            inventory_item_id,
+            location_id,
+            stocked_quantity: castNumber(level.quantity),
+          })
+        }
+      }
+    }
+
+    await mutateAsync(payload, {
+      onSuccess: () => {
+        toast.success(t("inventory.stock.successToast"))
+        handleSuccess()
+      },
+      onError: (error) => {
+        toast.error(error.message)
+      },
+    })
+  })
+
   return (
     <RouteFocusModal.Form form={form}>
-      <KeyboundForm className="flex size-full flex-col">
+      <KeyboundForm onSubmit={onSubmit} className="flex size-full flex-col">
         <RouteFocusModal.Header />
         <RouteFocusModal.Body className="size-full flex-1 overflow-y-auto">
           <DataGrid
@@ -56,7 +122,7 @@ export const InventoryStockForm = ({
                 {t("actions.cancel")}
               </Button>
             </RouteFocusModal.Close>
-            <Button type="submit" size="small">
+            <Button type="submit" size="small" isLoading={isPending}>
               {t("actions.save")}
             </Button>
           </div>
@@ -79,8 +145,14 @@ function getDefaultValues(
 
         locationAcc[location.id] = {
           id: level?.id,
-          quantity: level?.stocked_quantity ?? "",
+          quantity:
+            typeof level?.stocked_quantity === "number"
+              ? level?.stocked_quantity
+              : "",
           checked: !!level,
+          disabledToggle:
+            (level?.incoming_quantity || 0) > 0 ||
+            (level?.reserved_quantity || 0) > 0,
         }
         return locationAcc
       }, {} as InventoryLocationsSchema)

@@ -39,7 +39,6 @@ export const ProductStockForm = ({
   const { handleSuccess } = useRouteModal()
 
   const form = useForm<ProductStockSchema>({
-    // TODO: Update ProductVariant type to include inventory_items
     defaultValues: getDefaultValue(variants as any, locations),
     resolver: zodResolver(ProductStockSchema),
   })
@@ -67,17 +66,17 @@ export const ProductStockForm = ({
         variant.inventory_items
       )) {
         for (const [location_id, level] of Object.entries(item.locations)) {
-          if (level.levels_id) {
+          if (level.id) {
             const wasChecked =
               initialValues.current?.variants?.[variantId]?.inventory_items?.[
                 inventory_item_id
               ]?.locations?.[location_id]?.checked
 
             if (wasChecked && !level.checked) {
-              payload.delete.push(level.levels_id)
+              payload.delete.push(level.id)
             } else {
               const newQuantity =
-                level.quantity !== "" ? castNumber(level.quantity) : undefined
+                level.quantity !== "" ? castNumber(level.quantity) : 0
               const originalQuantity =
                 initialValues.current?.variants?.[variantId]?.inventory_items?.[
                   inventory_item_id
@@ -93,7 +92,7 @@ export const ProductStockForm = ({
             }
           }
 
-          if (!level.levels_id && level.quantity !== "") {
+          if (!level.id && level.quantity !== "") {
             payload.create.push({
               inventory_item_id,
               location_id,
@@ -106,7 +105,7 @@ export const ProductStockForm = ({
 
     await mutateAsync(payload, {
       onSuccess: () => {
-        toast.success("Updated inventory levels!")
+        toast.success(t("products.stock.successToast"))
         handleSuccess()
       },
       onError: (error) => {
@@ -163,17 +162,20 @@ function getDefaultValue(
     variants: variants.reduce((variantAcc, variant) => {
       const inventoryItems = variant.inventory_items.reduce((itemAcc, item) => {
         const locationsMap = locations.reduce((locationAcc, location) => {
-          const levels = item.inventory.location_levels?.find(
+          const level = item.inventory.location_levels?.find(
             (level) => level.location_id === location.id
           )
 
           locationAcc[location.id] = {
-            quantity: levels?.stocked_quantity || "",
-            levels_id: levels?.id,
-            checked: !!levels,
+            id: level?.id,
+            quantity:
+              level?.stocked_quantity !== undefined
+                ? level?.stocked_quantity
+                : "",
+            checked: !!level,
             disabledToggle:
-              (levels?.incoming_quantity || 0) > 0 ||
-              (levels?.reserved_quantity || 0) > 0,
+              (level?.incoming_quantity || 0) > 0 ||
+              (level?.reserved_quantity || 0) > 0,
           }
           return locationAcc
         }, {} as ProductStockLocationSchema)
