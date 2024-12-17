@@ -172,6 +172,7 @@ const DigitalProductOrder = model.define("digital_product_order", {
   status: model.enum(OrderStatus),
   products: model.manyToMany(() => DigitalProduct, {
     mappedBy: "orders",
+    pivotTable: "digitalproduct_digitalproductorders"
   }),
 })
 

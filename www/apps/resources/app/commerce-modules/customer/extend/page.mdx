@@ -329,43 +329,7 @@ The request will return the customer's details. You'll learn how to retrieve the
 
 When you extend an existing data model through links, you also want to retrieve the custom properties with the data model.
 
-### Retrieve in API Routes
-
-To retrieve the `custom_name` property when you're retrieving the customer through API routes, such as the [Get Customer API Route](!api!/admin#customers_getcustomersid), pass in the `fields` query parameter `+custom.*`, which retrieves the linked `Custom` record's details.
-
-<Note title="Tip">
-
-The `+` prefix in `+custom.*` indicates that the relation should be retrieved with the default customer fields. Learn more about selecting fields and relations in the [API reference](!api!/admin#select-fields-and-relations).
-
-</Note>
-
-For example:
-
-```bash
-curl 'localhost:9000/admin/customers/{customer_id}?fields=+custom.*' \
--H 'Authorization: Bearer {token}'
-```
-
-Make sure to replace `{customer_id}` with the customer's ID, and `{token}` with an admin user's JWT token.
-
-Among the returned `customer` object, you'll find a `custom` property which holds the details of the linked `Custom` record:
-
-```json
-{
-  "customer": {
-    // ...
-    "custom": {
-      "id": "01J9NP7ANXDZ0EAYF0956ZE1ZA",
-      "custom_name": "test",
-      "created_at": "2024-10-08T09:09:06.877Z",
-      "updated_at": "2024-10-08T09:09:06.877Z",
-      "deleted_at": null
-    }
-  }
-}
-```
-
-### Retrieve using Query
+### Retrieve in API Routes using Query
 
 You can also retrieve the `Custom` record linked to a customer in your code using [Query](!docs!/learn/fundamentals/module-links/query).
 
@@ -380,6 +344,8 @@ const { data: [customer] } = await query.graph({
   },
 })
 ```
+
+You can use Query in a custom route to retrieve the customer with its linked `Custom` record.
 
 Learn more about how to use Query in [this guide](!docs!/learn/fundamentals/module-links/query).
 

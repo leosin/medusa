@@ -652,6 +652,10 @@ export const filesMap = [
     "pathname": "/medusa-workflows-reference"
   },
   {
+    "filePath": "/www/apps/resources/app/nextjs-starter/guides/customize-stripe/page.mdx",
+    "pathname": "/nextjs-starter/guides/customize-stripe"
+  },
+  {
     "filePath": "/www/apps/resources/app/nextjs-starter/page.mdx",
     "pathname": "/nextjs-starter"
   },

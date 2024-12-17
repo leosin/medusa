@@ -2159,6 +2159,25 @@ export const sidebar = sidebarAttachHrefCommonOptions([
         type: "link",
         path: "/nextjs-starter",
         title: "Next.js Starter Storefront",
+        isChildSidebar: true,
+        children: [
+          {
+            type: "link",
+            path: "/nextjs-starter",
+            title: "Overview",
+          },
+          {
+            type: "category",
+            title: "Payment",
+            children: [
+              {
+                type: "link",
+                path: "/nextjs-starter/guides/customize-stripe",
+                title: "Customize Stripe Integration",
+              },
+            ],
+          },
+        ],
       },
     ],
   },

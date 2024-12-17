@@ -41,6 +41,7 @@ export type KnownDataTypes =
   | "enum"
   | "number"
   | "bigNumber"
+  | "float"
   | "serial"
   | "dateTime"
   | "array"
@@ -71,6 +72,7 @@ export type PropertyMetadata = {
   fieldName: string
   defaultValue?: any
   nullable: boolean
+  computed: boolean
   dataType: {
     name: KnownDataTypes
     options?: Record<string, any>

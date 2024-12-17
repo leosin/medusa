@@ -9168,7 +9168,33 @@ export const generatedSidebar = [
         "type": "link",
         "path": "/nextjs-starter",
         "title": "Next.js Starter Storefront",
-        "children": []
+        "isChildSidebar": true,
+        "children": [
+          {
+            "loaded": true,
+            "isPathHref": true,
+            "type": "link",
+            "path": "/nextjs-starter",
+            "title": "Overview",
+            "children": []
+          },
+          {
+            "loaded": true,
+            "isPathHref": true,
+            "type": "category",
+            "title": "Payment",
+            "children": [
+              {
+                "loaded": true,
+                "isPathHref": true,
+                "type": "link",
+                "path": "/nextjs-starter/guides/customize-stripe",
+                "title": "Customize Stripe Integration",
+                "children": []
+              }
+            ]
+          }
+        ]
       }
     ]
   },

@@ -1353,7 +1353,7 @@ medusaIntegrationTestRunner({
               { title: "variant two", options: { color: "blue" } },
             ],
           })
-          console.log(product)
+
           const [variantOne, variantTwo] = product.variants
 
           const [itemOne, itemTwo, itemThree] =

@@ -1,4 +1,5 @@
 import {
+  CalculatedShippingOptionPrice,
   Context,
   DAL,
   FilterableFulfillmentSetProps,
@@ -650,6 +651,28 @@ export default class FulfillmentModuleService
     return await this.baseRepository_.serialize<FulfillmentTypes.FulfillmentDTO>(
       fulfillment
     )
+  }
+
+  @InjectManager()
+  @EmitEvents()
+  async deleteFulfillment(
+    id: string,
+    @MedusaContext() sharedContext: Context = {}
+  ): Promise<void> {
+    const fulfillment = await this.fulfillmentService_.retrieve(
+      id,
+      {},
+      sharedContext
+    )
+
+    if (!isPresent(fulfillment.canceled_at)) {
+      throw new MedusaError(
+        MedusaError.Types.INVALID_DATA,
+        `Fulfillment with id ${fulfillment.id} needs to be canceled first before deleting`
+      )
+    }
+
+    await this.fulfillmentService_.delete(id, sharedContext)
   }
 
   @InjectManager()
@@ -1992,6 +2015,21 @@ export default class FulfillmentModuleService
       this.fulfillmentProviderService_.canCalculate(
         option.provider_id,
         option as unknown as Record<string, unknown>
+      )
+    )
+
+    return await promiseAll(promises)
+  }
+
+  async calculateShippingOptionsPrices(
+    shippingOptionsData: FulfillmentTypes.CalculateShippingOptionPriceDTO[]
+  ): Promise<CalculatedShippingOptionPrice[]> {
+    const promises = shippingOptionsData.map((data) =>
+      this.fulfillmentProviderService_.calculatePrice(
+        data.provider_id,
+        data.optionData,
+        data.data,
+        data.context
       )
     )
 

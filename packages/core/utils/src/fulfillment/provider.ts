@@ -1,5 +1,6 @@
 import {
   CalculatedShippingOptionPrice,
+  CalculateShippingOptionPriceDTO,
   FulfillmentOption,
   IFulfillmentProvider,
 } from "@medusajs/types"
@@ -20,7 +21,7 @@ import {
  *
  * #### Example
  *
- * ```ts
+ * ```ts title="src/modules/my-fulfillment/service.ts"
  * import { AbstractFulfillmentProviderService } from "@medusajs/framework/utils"
  * import { Logger } from "@medusajs/framework/types"
  *
@@ -56,13 +57,11 @@ export class AbstractFulfillmentProviderService
   implements IFulfillmentProvider
 {
   /**
-   * The `identifier` property holds a unique identifier of the fulfillment module provider.
+   * Each fulfillment provider has a unique identifier defined in its class. The provider's ID
+   * will be stored as `fp_{identifier}_{id}`, where `{id}` is the provider's `id`
+   * property in the `medusa-config.ts`.
    *
-   * You can use the kebab-case name of the provider as its value.
-   *
-   * For example:
-   *
-   * ```ts
+   * @example
    * class MyFulfillmentProviderService extends AbstractFulfillmentProviderService {
    *   static identifier = "my-fulfillment"
    *
@@ -204,27 +203,26 @@ export class AbstractFulfillmentProviderService
    * The Medusa application uses the {@link canCalculate} method first to check whether the shipping option's price is calculated.
    * If it returns `true`, Medusa uses this method to retrieve the calculated price.
    *
-   * @param optionData - The `data` property of a shipping option.
-   * @param data - If the price is calculated for a shipping option, it's the `data` of the shipping option. Otherwise, it's the `data of the shipping method.
-   * @param cart - The cart details.
+   * @param optionData - Shipping option data from the provider, the `data` property of a shipping option.
+   * @param data - Additional data passed when the price is calculated.
+   * @param context - The context details, such as the cart or customer.
    * @returns The calculated price
    *
    * @example
    * class MyFulfillmentProviderService extends AbstractFulfillmentProviderService {
    *   // ...
-   *   async calculatePrice(optionData: any, data: any, cart: any): Promise<number> {
+   *   async calculatePrice(optionData: any, data: any, context: any): Promise<number> {
    *     // assuming the client can calculate the price using
    *     // the third-party service
    *     const price = await this.client.calculate(data)
-   *
    *     return price
    *   }
    * }
    */
   async calculatePrice(
-    optionData: Record<string, unknown>,
-    data: Record<string, unknown>,
-    context: Record<string, unknown>
+    optionData: CalculateShippingOptionPriceDTO["optionData"],
+    data: CalculateShippingOptionPriceDTO["data"],
+    context: CalculateShippingOptionPriceDTO["context"]
   ): Promise<CalculatedShippingOptionPrice> {
     throw Error("calculatePrice must be overridden by the child class")
   }
