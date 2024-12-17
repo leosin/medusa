@@ -87,8 +87,8 @@ export const ProductVariantSection = ({
                   icon: <PencilSquare />,
                 },
                 {
-                  label: "Edit inventory items",
-                  to: `inventory`,
+                  label: t("products.stock.action"),
+                  to: `stock`,
                   icon: <Buildings />,
                 },
               ],
@@ -123,7 +123,7 @@ export const ProductVariantSection = ({
                 ).join(",")}`
               )
             },
-            label: "Edit inventory",
+            label: t("products.stock.action"),
             shortcut: "i",
           },
         ]}

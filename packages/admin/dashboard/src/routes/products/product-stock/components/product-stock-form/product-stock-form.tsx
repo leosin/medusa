@@ -12,12 +12,12 @@ import {
 import { KeyboundForm } from "../../../../../components/utilities/keybound-form"
 import { useBatchInventoryLevels } from "../../../../../hooks/api"
 import { castNumber } from "../../../../../lib/cast-number"
-import { useProductInventoryColumns } from "../../hooks/use-product-inventory-columns"
+import { useProductStockColumns } from "../../hooks/use-product-stock-columns"
 import {
-  ProductInventoryInventoryItemSchema,
-  ProductInventorySchema,
-  ProductInventoryVariantSchema,
-  ProductVariantLocationSchema,
+  ProductStockInventoryItemSchema,
+  ProductStockLocationSchema,
+  ProductStockSchema,
+  ProductStockVariantSchema,
 } from "../../schema"
 import { ProductVariantInventoryItemLink } from "../../types"
 import {
@@ -25,23 +25,23 @@ import {
   isProductVariantWithInventoryPivot,
 } from "../../utils"
 
-type ProductInventoryFormProps = {
+type ProductStockFormProps = {
   variants: HttpTypes.AdminProductVariant[]
   locations: HttpTypes.AdminStockLocation[]
 }
 
-export const ProductInventoryForm = ({
+export const ProductStockForm = ({
   variants,
   locations,
-}: ProductInventoryFormProps) => {
+}: ProductStockFormProps) => {
   const { t } = useTranslation()
   const { setCloseOnEscape } = useRouteModal()
   const { handleSuccess } = useRouteModal()
 
-  const form = useForm<ProductInventorySchema>({
+  const form = useForm<ProductStockSchema>({
     // TODO: Update ProductVariant type to include inventory_items
     defaultValues: getDefaultValue(variants as any, locations),
-    resolver: zodResolver(ProductInventorySchema),
+    resolver: zodResolver(ProductStockSchema),
   })
 
   const initialValues = useRef(getDefaultValue(variants as any, locations))
@@ -50,7 +50,7 @@ export const ProductInventoryForm = ({
     () => getDisabledInventoryRows(variants as any),
     [variants]
   )
-  const columns = useProductInventoryColumns(locations, disabled)
+  const columns = useProductStockColumns(locations, disabled)
 
   const { mutateAsync, isPending } = useBatchInventoryLevels()
 
@@ -107,9 +107,9 @@ export const ProductInventoryForm = ({
 
   return (
     <RouteFocusModal.Form form={form}>
-      <KeyboundForm onSubmit={onSubmit}>
+      <KeyboundForm onSubmit={onSubmit} className="flex h-full flex-col">
         <RouteFocusModal.Header />
-        <RouteFocusModal.Body>
+        <RouteFocusModal.Body className="flex-1">
           <DataGrid
             state={form}
             columns={columns}
@@ -148,7 +148,7 @@ function getDefaultValue(
     inventory_items: ProductVariantInventoryItemLink[]
   })[],
   locations: HttpTypes.AdminStockLocation[]
-): DefaultValues<ProductInventorySchema> {
+): DefaultValues<ProductStockSchema> {
   return {
     variants: variants.reduce((variantAcc, variant) => {
       const inventoryItems = variant.inventory_items.reduce((itemAcc, item) => {
@@ -161,16 +161,19 @@ function getDefaultValue(
             quantity: levels?.stocked_quantity || "",
             levels_id: levels?.id,
             checked: !!levels,
+            disabledToggle:
+              (levels?.incoming_quantity || 0) > 0 ||
+              (levels?.reserved_quantity || 0) > 0,
           }
           return locationAcc
-        }, {} as ProductVariantLocationSchema)
+        }, {} as ProductStockLocationSchema)
 
         itemAcc[item.inventory_item_id] = { locations: locationsMap }
         return itemAcc
-      }, {} as Record<string, ProductInventoryInventoryItemSchema>)
+      }, {} as Record<string, ProductStockInventoryItemSchema>)
 
       variantAcc[variant.id] = { inventory_items: inventoryItems }
       return variantAcc
-    }, {} as Record<string, ProductInventoryVariantSchema>),
+    }, {} as Record<string, ProductStockVariantSchema>),
   }
 }

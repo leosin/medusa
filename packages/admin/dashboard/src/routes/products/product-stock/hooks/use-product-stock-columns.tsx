@@ -2,18 +2,20 @@ import { InformationCircle } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
 import { Switch, Tooltip } from "@medusajs/ui"
 import { useCallback, useMemo } from "react"
+
+import { useTranslation } from "react-i18next"
 import { Thumbnail } from "../../../../components/common/thumbnail"
 import { createDataGridHelper } from "../../../../components/data-grid"
 import { DataGridReadOnlyCell } from "../../../../components/data-grid/components"
 import { DataGridDuplicateCell } from "../../../../components/data-grid/components/data-grid-duplicate-cell"
 import { DataGridTogglableNumberCell } from "../../../../components/data-grid/components/data-grid-toggleable-number-cell"
-import { ProductInventorySchema } from "../schema"
+import { ProductStockSchema } from "../schema"
 import { ProductVariantInventoryItemLink } from "../types"
 import { isProductVariant } from "../utils"
 
 const helper = createDataGridHelper<
   HttpTypes.AdminProductVariant | ProductVariantInventoryItemLink,
-  ProductInventorySchema
+  ProductStockSchema
 >()
 
 type DisabledItem = { id: string; title: string; sku: string }
@@ -27,10 +29,11 @@ type DisabledResult =
       item: undefined
     }
 
-export const useProductInventoryColumns = (
+export const useProductStockColumns = (
   locations: HttpTypes.AdminStockLocation[] = [],
   disabled: Record<string, DisabledItem> = {}
 ) => {
+  const { t } = useTranslation()
   const getIsDisabled = useCallback(
     (item: ProductVariantInventoryItemLink): DisabledResult => {
       const disabledItem = disabled[item.inventory_item_id]
@@ -84,9 +87,16 @@ export const useProductInventoryColumns = (
                     {item.inventory.title || "-"}
                   </span>
                   <Tooltip
-                    content={`This inventory item is already editable under ${
-                      disabledItem.title
-                    }${disabledItem.sku ? ` (${disabledItem.sku})` : ""}`}
+                    content={
+                      disabledItem.sku
+                        ? t("products.stock.tooltips.alreadyManagedWithSku", {
+                            title: disabledItem.title,
+                            sku: disabledItem.sku,
+                          })
+                        : t("products.stock.tooltips.alreadyManaged", {
+                            title: disabledItem.title,
+                          })
+                    }
                   >
                     <InformationCircle />
                   </Tooltip>
@@ -148,10 +158,10 @@ export const useProductInventoryColumns = (
               return null
             }
 
-            const { isDisabled, item: disabledItem } = getIsDisabled(item)
+            const { isDisabled } = getIsDisabled(item)
 
             if (isDisabled) {
-              return `variants.${disabledItem.id}.inventory_items.${item.inventory_item_id}.locations.${location.id}` as const
+              return null
             }
 
             return `variants.${item.variant_id}.inventory_items.${item.inventory_item_id}.locations.${location.id}` as const
@@ -164,11 +174,13 @@ export const useProductInventoryColumns = (
               return <DataGridReadOnlyCell context={context} />
             }
 
-            const { isDisabled } = getIsDisabled(item)
+            const { isDisabled, item: disabledItem } = getIsDisabled(item)
 
             if (isDisabled) {
               return (
-                <DataGridDuplicateCell context={context}>
+                <DataGridDuplicateCell
+                  duplicateOf={`variants.${disabledItem.id}.inventory_items.${item.inventory_item_id}.locations.${location.id}`}
+                >
                   {({ value }) => {
                     const { checked, quantity } = value as {
                       checked: boolean
@@ -193,23 +205,11 @@ export const useProductInventoryColumns = (
               )
             }
 
-            // Depending on how we want to handle the checked state, we might need
-            // to move this to the form state.
-            // const locationLevel = item.inventory.location_levels?.find(
-            //   (level) => level.location_id === location.id
-            // )
-
-            // const disableToggle = Boolean(
-            //   locationLevel &&
-            //     (locationLevel.reserved_quantity > 0 ||
-            //       locationLevel.incoming_quantity > 0)
-            // )
-
             return <DataGridTogglableNumberCell context={context} />
           },
         })
       ),
     ],
-    [locations, getIsDisabled]
+    [locations, getIsDisabled, t]
   )
 }

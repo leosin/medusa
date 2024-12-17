@@ -26,7 +26,7 @@ export interface CreateInventoryLevelInput {
  */
 export interface UpdateInventoryLevelInput {
   /**
-   * id of the inventory level to update
+   * ID of the inventory level to update
    */
   id?: string
   /**

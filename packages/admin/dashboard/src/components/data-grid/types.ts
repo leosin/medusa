@@ -164,3 +164,9 @@ export type GridColumnOption = {
   checked: boolean
   disabled: boolean
 }
+
+export type DataGridToggleableNumber = {
+  quantity: number | string
+  checked: boolean
+  disabledToggle: boolean
+}

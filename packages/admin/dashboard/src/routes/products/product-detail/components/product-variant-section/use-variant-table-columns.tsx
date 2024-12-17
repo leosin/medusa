@@ -73,11 +73,6 @@ const VariantActions = ({
               to: `edit-variant?variant_id=${variant.id}`,
               icon: <PencilSquare />,
             },
-            {
-              label: t("actions.delete"),
-              onClick: handleDelete,
-              icon: <Trash />,
-            },
             hasInventoryItem
               ? {
                   label: t("products.variant.inventory.actions.inventoryItems"),
@@ -93,6 +88,15 @@ const VariantActions = ({
                 }
               : false,
           ].filter(Boolean) as Action[],
+        },
+        {
+          actions: [
+            {
+              label: t("actions.delete"),
+              onClick: handleDelete,
+              icon: <Trash />,
+            },
+          ],
         },
       ]}
     />

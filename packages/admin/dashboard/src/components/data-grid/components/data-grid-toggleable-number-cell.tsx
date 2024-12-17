@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react"
 import CurrencyInput, { CurrencyInputProps } from "react-currency-input-field"
 import { Controller, ControllerRenderProps } from "react-hook-form"
 import { useCombinedRefs } from "../../../hooks/use-combined-refs"
+import { ConditionalTooltip } from "../../common/conditional-tooltip"
 import { useDataGridCell, useDataGridCellError } from "../hooks"
 import { DataGridCellProps, InputProps } from "../types"
 import { DataGridCellContainer } from "./data-grid-cell-container"
@@ -85,15 +86,21 @@ const OuterComponent = ({
   }, [isAnchor])
 
   return (
-    <div className="absolute inset-y-0 left-4 z-[3] flex w-fit items-center justify-center">
-      <Switch
-        ref={buttonRef}
-        size="small"
-        className="shrink-0"
-        checked={localValue.checked}
-        onCheckedChange={handleCheckedChange}
-      />
-    </div>
+    <ConditionalTooltip
+      showTooltip={localValue.disabledToggle}
+      content={`Cannot disable: clear incoming and/or reserved quantities first.`}
+    >
+      <div className="absolute inset-y-0 left-4 z-[3] flex w-fit items-center justify-center">
+        <Switch
+          ref={buttonRef}
+          size="small"
+          className="shrink-0"
+          checked={localValue.checked}
+          disabled={localValue.disabledToggle}
+          onCheckedChange={handleCheckedChange}
+        />
+      </div>
+    </ConditionalTooltip>
   )
 }
 

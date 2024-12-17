@@ -130,9 +130,9 @@ export const RouteMap: RouteObject[] = [
                           ),
                       },
                       {
-                        path: "inventory",
+                        path: "stock",
                         lazy: () =>
-                          import("../../routes/products/product-inventory"),
+                          import("../../routes/products/product-stock"),
                       },
                       {
                         path: "metadata/edit",
