@@ -33,14 +33,25 @@ export const batchInventoryItemLevelsWorkflowId =
 export const batchInventoryItemLevelsWorkflow = createWorkflow(
   batchInventoryItemLevelsWorkflowId,
   (input: WorkflowData<BatchInventoryItemLevelsWorkflowInput>) => {
+    const { createInput, updateInput, deleteInput } = transform(
+      input,
+      (data) => {
+        return {
+          createInput: data.create || [],
+          updateInput: data.update || [],
+          deleteInput: {
+            id: data.delete || [],
+            force: data.force ?? false,
+          },
+        }
+      }
+    )
+
     const res = parallelize(
-      createInventoryLevelsStep(input.create ?? []),
-      updateInventoryLevelsStep(input.update ?? []),
+      createInventoryLevelsStep(createInput),
+      updateInventoryLevelsStep(updateInput),
       deleteInventoryLevelsWorkflow.runAsStep({
-        input: {
-          id: input.delete ?? [],
-          force: input.force ?? false,
-        },
+        input: deleteInput,
       })
     )
 
