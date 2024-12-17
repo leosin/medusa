@@ -3023,3 +3023,50 @@ export interface OrderPreviewDTO
   })[]
   return_requested_total: number
 }
+
+/**
+ * The order credit line details.
+ */
+export interface OrderCreditLineDTO {
+  /**
+   * The ID of the order credit line.
+   */
+  id: string
+
+  /**
+   * The ID of the order that the credit line belongs to.
+   */
+  order_id: string
+
+  /**
+   * The associated order
+   *
+   * @expandable
+   */
+  order: OrderDTO
+
+  /**
+   * The reference model name that the credit line is generated from
+   */
+  reference: string | null
+
+  /**
+   * The reference model id that the credit line is generated from
+   */
+  reference_id: string | null
+
+  /**
+   * The metadata of the order detail
+   */
+  metadata: Record<string, unknown> | null
+
+  /**
+   * The date when the order credit line was created.
+   */
+  created_at: Date
+
+  /**
+   * The date when the order credit line was last updated.
+   */
+  updated_at: Date
+}
