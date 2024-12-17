@@ -444,6 +444,29 @@ export const useDataGridKeydownEvent = <
     [anchor, matrix, handleEnterKeyTextOrNumber, handleEnterKeyBoolean]
   )
 
+  const handleDeleteKeyTogglableNumber = useCallback(
+    (anchor: DataGridCoordinates, rangeEnd: DataGridCoordinates) => {
+      const fields = matrix.getFieldsInSelection(anchor, rangeEnd)
+      const prev = getSelectionValues(fields)
+
+      const next = prev.map((value) => ({
+        ...value,
+        quantity: "",
+        checked: value.disableToggle ? value.checked : false,
+      }))
+
+      const command = new DataGridBulkUpdateCommand({
+        fields,
+        next,
+        prev,
+        setter: setSelectionValues,
+      })
+
+      execute(command)
+    },
+    [matrix, getSelectionValues, setSelectionValues, execute]
+  )
+
   const handleDeleteKeyTextOrNumber = useCallback(
     (anchor: DataGridCoordinates, rangeEnd: DataGridCoordinates) => {
       const fields = matrix.getFieldsInSelection(anchor, rangeEnd)
@@ -502,6 +525,9 @@ export const useDataGridKeydownEvent = <
         case "boolean":
           handleDeleteKeyBoolean(anchor, rangeEnd)
           break
+        case "togglable-number":
+          handleDeleteKeyTogglableNumber(anchor, rangeEnd)
+          break
       }
     },
     [
@@ -511,6 +537,7 @@ export const useDataGridKeydownEvent = <
       matrix,
       handleDeleteKeyTextOrNumber,
       handleDeleteKeyBoolean,
+      handleDeleteKeyTogglableNumber,
     ]
   )
 

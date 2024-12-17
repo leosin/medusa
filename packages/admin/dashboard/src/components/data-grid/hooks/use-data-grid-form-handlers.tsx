@@ -170,17 +170,25 @@ function setValue<
         : null
 
     // Determine if checked should be updated
-    let shouldUpdateChecked = false
-    if (!disabledToggle && newQuantityNumber != null) {
-      if (currentChecked === false && newQuantityNumber > 0) {
-        shouldUpdateChecked = true
+    let newChecked = currentChecked
+    if (!disabledToggle) {
+      if (
+        currentChecked === false &&
+        newQuantityNumber != null &&
+        newQuantityNumber > 0
+      ) {
+        newChecked = true
+      }
+
+      if (currentChecked === true && !newQuantityNumber) {
+        newChecked = false
       }
     }
 
     set(currentValues, field, {
       ...currentValue,
       quantity: newValue.quantity,
-      checked: shouldUpdateChecked ? true : currentChecked,
+      checked: newChecked,
     })
 
     return
