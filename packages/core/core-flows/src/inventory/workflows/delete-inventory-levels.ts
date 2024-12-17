@@ -73,15 +73,24 @@ export const deleteInventoryLevelsWorkflowId =
 export const deleteInventoryLevelsWorkflow = createWorkflow(
   deleteInventoryLevelsWorkflowId,
   (input: WorkflowData<DeleteInventoryLevelsWorkflowInput>) => {
+    const { filters, force } = transform(input, (data) => {
+      const { force, ...filters } = data
+
+      return {
+        filters,
+        force,
+      }
+    })
+
     const inventoryLevels = useRemoteQueryStep({
       entry_point: "inventory_levels",
       fields: ["id", "stocked_quantity", "reserved_quantity", "location_id"],
       variables: {
-        filters: input,
+        filters: filters,
       },
     })
 
-    validateInventoryLevelsDelete({ inventoryLevels, force: input.force })
+    validateInventoryLevelsDelete({ inventoryLevels, force })
 
     const idsToDelete = transform({ inventoryLevels }, ({ inventoryLevels }) =>
       inventoryLevels.map((il) => il.id)

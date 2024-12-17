@@ -211,17 +211,20 @@ export const useUpdateInventoryLevel = (
   })
 }
 
-export const useBatchUpdateInventoryLevels = (
+export const useBatchInventoryItemLocationLevels = (
   inventoryItemId: string,
   options?: UseMutationOptions<
     HttpTypes.AdminInventoryItemResponse,
     FetchError,
-    HttpTypes.AdminBatchUpdateInventoryLevelLocation
+    HttpTypes.AdminBatchInventoryItemLocationLevels
   >
 ) => {
   return useMutation({
-    mutationFn: (payload: HttpTypes.AdminBatchUpdateInventoryLevelLocation) =>
-      sdk.admin.inventoryItem.batchUpdateLevels(inventoryItemId, payload),
+    mutationFn: (payload) =>
+      sdk.admin.inventoryItem.batchInventoryItemLocationLevels(
+        inventoryItemId,
+        payload
+      ),
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({
         queryKey: inventoryItemsQueryKeys.lists(),
@@ -238,16 +241,16 @@ export const useBatchUpdateInventoryLevels = (
   })
 }
 
-export const useBatchInventoryLevels = (
+export const useBatchInventoryItemsLocationLevels = (
   options?: UseMutationOptions<
     HttpTypes.AdminInventoryItemResponse,
     FetchError,
-    HttpTypes.AdminBatchInventoryItemLevels
+    HttpTypes.AdminBatchInventoryItemsLocationLevels
   >
 ) => {
   return useMutation({
-    mutationFn: (payload: HttpTypes.AdminBatchInventoryItemLevels) =>
-      sdk.admin.inventoryItem._batchUpdateLevels(payload),
+    mutationFn: (payload) =>
+      sdk.admin.inventoryItem.batchInventoryItemsLocationLevels(payload),
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({
         queryKey: inventoryItemsQueryKeys.all,

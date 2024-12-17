@@ -10,7 +10,7 @@ import {
   useRouteModal,
 } from "../../../../../components/modals"
 import { KeyboundForm } from "../../../../../components/utilities/keybound-form"
-import { useBatchInventoryLevels } from "../../../../../hooks/api"
+import { useBatchInventoryItemsLocationLevels } from "../../../../../hooks/api"
 import { castNumber } from "../../../../../lib/cast-number"
 import { useProductStockColumns } from "../../hooks/use-product-stock-columns"
 import {
@@ -52,13 +52,14 @@ export const ProductStockForm = ({
   )
   const columns = useProductStockColumns(locations, disabled)
 
-  const { mutateAsync, isPending } = useBatchInventoryLevels()
+  const { mutateAsync, isPending } = useBatchInventoryItemsLocationLevels()
 
   const onSubmit = form.handleSubmit(async (data) => {
-    const payload: HttpTypes.AdminBatchInventoryItemLevels = {
+    const payload: HttpTypes.AdminBatchInventoryItemsLocationLevels = {
       create: [],
       update: [],
       delete: [],
+      force: true,
     }
 
     for (const [variantId, variant] of Object.entries(data.variants)) {
@@ -67,19 +68,28 @@ export const ProductStockForm = ({
       )) {
         for (const [location_id, level] of Object.entries(item.locations)) {
           if (level.levels_id) {
-            const newQuantity =
-              level.quantity !== "" ? castNumber(level.quantity) : undefined
-            const originalQuantity =
+            const wasChecked =
               initialValues.current?.variants?.[variantId]?.inventory_items?.[
                 inventory_item_id
-              ]?.locations?.[location_id]?.quantity
+              ]?.locations?.[location_id]?.checked
 
-            if (newQuantity !== originalQuantity) {
-              payload.update.push({
-                inventory_item_id,
-                location_id,
-                stocked_quantity: newQuantity,
-              })
+            if (wasChecked && !level.checked) {
+              payload.delete.push(level.levels_id)
+            } else {
+              const newQuantity =
+                level.quantity !== "" ? castNumber(level.quantity) : undefined
+              const originalQuantity =
+                initialValues.current?.variants?.[variantId]?.inventory_items?.[
+                  inventory_item_id
+                ]?.locations?.[location_id]?.quantity
+
+              if (newQuantity !== originalQuantity) {
+                payload.update.push({
+                  inventory_item_id,
+                  location_id,
+                  stocked_quantity: newQuantity,
+                })
+              }
             }
           }
 

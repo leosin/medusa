@@ -133,13 +133,20 @@ const Inner = ({
   const combinedRefs = useCombinedRefs(inputRef, ref)
 
   const handleInputChange: CurrencyInputProps["onValueChange"] = (
-    value,
+    updatedValue,
     _name,
     _values
   ) => {
-    const ensuredValue = value || ""
-
+    const ensuredValue = updatedValue || ""
     const newValue = { ...localValue, quantity: ensuredValue }
+
+    /**
+     * If the value is not empty, then the location should be enabled.
+     */
+    if (ensuredValue !== "") {
+      newValue.checked = true
+    }
+
     setLocalValue(newValue)
   }
 

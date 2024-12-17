@@ -58,16 +58,3 @@ export interface AdminCreateInventoryItem {
 }
 
 export interface AdminUpdateInventoryItem extends AdminCreateInventoryItem {}
-
-export interface AdminBatchInventoryItemLevel {
-  location_id: string
-  inventory_item_id: string
-  stocked_quantity?: number
-  incoming_quantity?: number
-}
-
-export interface AdminBatchInventoryItemLevels {
-  create: AdminBatchInventoryItemLevel[]
-  update: AdminBatchInventoryItemLevel[]
-  delete: string[]
-}

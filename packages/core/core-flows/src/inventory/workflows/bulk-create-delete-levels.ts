@@ -1,3 +1,5 @@
+// TODO: Remove this workflow in a future release.
+
 import { InventoryLevelDTO, InventoryTypes } from "@medusajs/framework/types"
 import {
   createWorkflow,

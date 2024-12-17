@@ -377,7 +377,7 @@ export class InventoryItem {
    */
   async batchUpdateLevels(
     id: string,
-    body: HttpTypes.AdminBatchUpdateInventoryLevelLocation,
+    body: HttpTypes.AdminBatchInventoryItemLocationLevels,
     query?: SelectParams,
     headers?: ClientHeaders
   ) {
@@ -398,18 +398,18 @@ export class InventoryItem {
    * API route.
    *
    * @param id - The inventory item's ID.
-   * @param body - The inventory levels to create or delete.
+   * @param body - The inventory levels to create, update or delete.
    * @param query - Configure the fields to retrieve in the inventory item.
    * @param headers - Headers to pass in the request
    * @returns The inventory item's details.
    *
    * @example
-   * sdk.admin.inventoryItem.batchUpdateInvetoryItemLocationLevels("iitem_123", {
+   * sdk.admin.inventoryItem.batchInventoryItemLocationLevels("iitem_123", {
    *   create: [{
    *     location_id: "sloc_123",
    *     stocked_quantity: 10
    *   }],
-   *   delete: ["sloc_123"]
+   *   delete: ["ilvl_123"]
    * })
    * .then(({ inventory_item }) => {
    *   console.log(inventory_item)
@@ -417,7 +417,7 @@ export class InventoryItem {
    */
   async batchInventoryItemLocationLevels(
     id: string,
-    body: HttpTypes.AdminBatchUpdateInventoryLevelLocation,
+    body: HttpTypes.AdminBatchInventoryItemLocationLevels,
     query?: SelectParams,
     headers?: ClientHeaders
   ) {
@@ -432,8 +432,29 @@ export class InventoryItem {
     )
   }
 
+  /**
+   * This method manages the inventory levels of multiple inventory items.
+   *
+   * @param body - The inventory levels to create, update or delete.
+   * @param query - Configure the fields to retrieve in the inventory item.
+   * @param headers - Headers to pass in the request
+   * @returns The inventory item's details.
+   *
+   * @example
+   * sdk.admin.inventoryItem.batchInventoryItemsLocationLevels({
+   *   create: [{
+   *     inventory_item_id: "iitem_123",
+   *     location_id: "sloc_123",
+   *     stocked_quantity: 10
+   *   }],
+   *   delete: ["ilvl_123"]
+   * })
+   * .then(({ inventory_item }) => {
+   *   console.log(inventory_item)
+   * })
+   */
   async batchInventoryItemsLocationLevels(
-    body: HttpTypes.AdminBatchInventoryItemLevels,
+    body: HttpTypes.AdminBatchInventoryItemsLocationLevels,
     headers?: ClientHeaders
   ) {
     return await this.client.fetch<HttpTypes.AdminInventoryItemResponse>(

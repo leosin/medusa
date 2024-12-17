@@ -47,22 +47,6 @@ export interface UpdateInventoryLevelInput {
   incoming_quantity?: number
 }
 
-/**
- * @interface
- *
- * The attributes to update in an inventory level. The inventory level is identified by the IDs of its associated inventory item and location.
- */
-export type BulkUpdateInventoryLevelInput = {
-  /**
-   * The ID of the associated inventory level.
-   */
-  inventory_item_id: string
-  /**
-   * The ID of the associated location.
-   */
-  location_id: string
-} & UpdateInventoryLevelInput
-
 export type BulkAdjustInventoryLevelInput = {
   /**
    * The ID of the associated inventory level.
@@ -77,4 +61,4 @@ export type BulkAdjustInventoryLevelInput = {
    * The quantity to adjust the inventory level by.
    */
   adjustment: BigNumberInput
-} & UpdateInventoryLevelInput
+}
