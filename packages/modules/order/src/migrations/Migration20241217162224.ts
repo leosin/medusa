@@ -1,9 +1,9 @@
 import { Migration } from "@mikro-orm/migrations"
 
-export class Migration20241217144234 extends Migration {
+export class Migration20241217162224 extends Migration {
   async up(): Promise<void> {
     this.addSql(
-      'create table if not exists "order_credit_line" ("id" text not null, "order_id" text not null, "reference" text null, "reference_id" text null, "metadata" jsonb null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "deleted_at" timestamptz null, constraint "order_credit_line_pkey" primary key ("id"));'
+      'create table if not exists "order_credit_line" ("id" text not null, "order_id" text not null, "reference" text null, "reference_id" text null, "amount" numeric not null, "raw_amount" jsonb not null, "metadata" jsonb null, "created_at" timestamptz not null default now(), "updated_at" timestamptz not null default now(), "deleted_at" timestamptz null, constraint "order_credit_line_pkey" primary key ("id"));'
     )
 
     this.addSql(

@@ -1,7 +1,9 @@
-import { DAL } from "@medusajs/framework/types"
+import { BigNumberRawValue, DAL } from "@medusajs/framework/types"
 import {
+  BigNumber,
   createPsqlIndexStatementHelper,
   generateEntityId,
+  MikroOrmBigNumberProperty,
 } from "@medusajs/framework/utils"
 import {
   BeforeCreate,
@@ -62,6 +64,12 @@ export default class OrderCreditLine {
     nullable: true,
   })
   reference_id: string | null = null
+
+  @MikroOrmBigNumberProperty()
+  amount: BigNumber | number
+
+  @Property({ columnType: "jsonb" })
+  raw_amount: BigNumberRawValue
 
   @Property({ columnType: "jsonb", nullable: true })
   metadata: Record<string, unknown> | null = null

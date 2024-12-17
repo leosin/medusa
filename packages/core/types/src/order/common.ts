@@ -26,6 +26,7 @@ export type ChangeActionType =
   | "REINSTATE_ITEM"
   | "TRANSFER_CUSTOMER"
   | "UPDATE_ORDER_PROPERTIES"
+  | "CREDIT_LINE_ADD"
 
 export type OrderChangeStatus =
   | "confirmed"
@@ -1167,6 +1168,13 @@ export interface OrderDTO {
    * @expandable
    */
   transactions?: OrderTransactionDTO[]
+
+  /**
+   * The credit lines for an order
+   *
+   * @expandable
+   */
+  credit_lines?: OrderCreditLineDTO[]
 
   /**
    * The summary of the order totals.
