@@ -5,6 +5,7 @@ import {
   PaymentCollectionDTO,
 } from "@medusajs/framework/types"
 import {
+  MathBN,
   MedusaError,
   OrderWorkflowEvents,
   deepFlatMap,
@@ -18,11 +19,13 @@ import {
   parallelize,
   transform,
 } from "@medusajs/framework/workflows-sdk"
-import { emitEventStep, useRemoteQueryStep } from "../../common"
+import { emitEventStep, useQueryGraphStep } from "../../common"
 import { cancelPaymentStep } from "../../payment/steps"
 import { deleteReservationsByLineItemsStep } from "../../reservation/steps"
 import { cancelOrdersStep } from "../steps/cancel-orders"
 import { throwIfOrderIsCancelled } from "../utils/order-validation"
+import { createOrderRefundCreditLinesWorkflow } from "./payments/create-order-refund-credit-lines"
+import { refundCapturedPaymentsWorkflow } from "./payments/refund-captured-payments"
 
 /**
  * This step validates that an order can be canceled.
@@ -43,19 +46,10 @@ export const cancelValidateOrder = createStep(
     throwIfOrderIsCancelled({ order })
 
     let refunds = 0
-    let captures = 0
 
     deepFlatMap(order_, "payment_collections.payments", ({ payments }) => {
       refunds += payments?.refunds?.length ?? 0
-      captures += payments?.captures?.length ?? 0
     })
-
-    if (captures > 0) {
-      throw new MedusaError(
-        MedusaError.Types.NOT_ALLOWED,
-        "Order with payment capture(s) cannot be canceled"
-      )
-    }
 
     if (refunds > 0) {
       throw new MedusaError(
@@ -90,37 +84,80 @@ export const cancelOrderWorkflowId = "cancel-order"
 export const cancelOrderWorkflow = createWorkflow(
   cancelOrderWorkflowId,
   (input: WorkflowData<OrderWorkflow.CancelOrderWorkflowInput>) => {
-    const order: OrderDTO & { fulfillments: FulfillmentDTO[] } =
-      useRemoteQueryStep({
-        entry_point: "orders",
-        fields: [
-          "id",
-          "status",
-          "items.id",
-          "fulfillments.canceled_at",
-          "payment_collections.payments.id",
-          "payment_collections.payments.refunds.id",
-          "payment_collections.payments.captures.id",
-        ],
-        variables: { id: input.order_id },
-        list: false,
-        throw_if_key_not_found: true,
-      })
+    const orderQuery = useQueryGraphStep({
+      entity: "orders",
+      fields: [
+        "id",
+        "status",
+        "items.id",
+        "fulfillments.canceled_at",
+        "payment_collections.payments.id",
+        "payment_collections.payments.refunds.id",
+        "payment_collections.payments.refunds.amount",
+        "payment_collections.payments.captures.id",
+        "payment_collections.payments.captures.amount",
+      ],
+      filters: { id: input.order_id },
+      options: { throwIfKeyNotFound: true },
+    }).config({ name: "get-cart" })
+
+    const order = transform({ orderQuery }, ({ orderQuery }) => {
+      return orderQuery.data[0]
+    })
 
     cancelValidateOrder({ order, input })
 
-    const lineItemIds = transform({ order }, ({ order }) => {
-      return order.items?.map((i) => i.id)
-    })
-
-    const paymentIds = transform({ order }, ({ order }) => {
-      return deepFlatMap(
+    const payments = transform({ order }, ({ order }) => {
+      const payments = deepFlatMap(
         order,
         "payment_collections.payments",
-        ({ payments }) => {
-          return payments?.id
-        }
+        ({ payments }) => payments
       )
+
+      const capturedPayments = payments.filter(
+        (payment) => payment.captures.length > 0
+      )
+
+      const uncapturedPayments = payments.filter(
+        (payment) => payment.captures.length === 0
+      )
+
+      return {
+        capturedPayments,
+        uncapturedPayments,
+      }
+    })
+
+    const totalCaptured = transform({ payments }, ({ payments }) => {
+      const paymentCaptures = deepFlatMap(
+        payments.capturedPayments,
+        "captures",
+        ({ captures }) => captures
+      )
+
+      return paymentCaptures.reduce(
+        (acc, capturedPayment) => MathBN.sum(acc, capturedPayment.amount),
+        MathBN.convert(0)
+      )
+    })
+
+    createOrderRefundCreditLinesWorkflow.runAsStep({
+      input: {
+        order_id: order.id,
+        amount: totalCaptured,
+      },
+    })
+
+    refundCapturedPaymentsWorkflow.runAsStep({
+      input: { order_id: order.id },
+    })
+
+    const paymentIds = transform({ payments }, ({ payments }) => {
+      return payments.uncapturedPayments.map((payment) => payment.id)
+    })
+
+    const lineItemIds = transform({ order }, ({ order }) => {
+      return order.items?.map((i) => i.id)
     })
 
     parallelize(

@@ -58,12 +58,13 @@ export class OrderChangeProcessing {
     let paid = MathBN.convert(0)
     let refunded = MathBN.convert(0)
     let transactionTotal = MathBN.convert(0)
+    let pendingDifference = MathBN.convert(0)
     let creditLineTotal = (this.order.credit_lines || []).reduce(
       (acc, creditLine) => MathBN.add(acc, creditLine.amount),
       MathBN.convert(0)
     )
 
-    const currentOrderTotal = MathBN.add(this.order.total ?? 0, creditLineTotal)
+    pendingDifference = MathBN.sub(pendingDifference, creditLineTotal)
 
     for (const tr of transactions) {
       if (MathBN.lt(tr.amount, 0)) {
@@ -79,7 +80,7 @@ export class OrderChangeProcessing {
     this.summary = {
       pending_difference: 0,
       difference_sum: 0,
-      current_order_total: currentOrderTotal,
+      current_order_total: this.order.total ?? 0,
       original_order_total: this.order.total ?? 0,
       transaction_total: transactionTotal,
       paid_total: paid,

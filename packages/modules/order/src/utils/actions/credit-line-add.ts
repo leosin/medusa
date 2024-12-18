@@ -3,6 +3,7 @@ import { OrderChangeProcessing } from "../calculate-order-change"
 import { setActionReference } from "../set-action-reference"
 
 OrderChangeProcessing.registerActionType(ChangeActionType.CREDIT_LINE_ADD, {
+  isDeduction: true,
   operation({ action, currentOrder, options }) {
     const creditLines = currentOrder.credit_lines ?? []
     let existing = creditLines.find((cl) => cl.id === action.reference_id)
