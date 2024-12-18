@@ -205,7 +205,14 @@ export const useProductStockColumns = (
               )
             }
 
-            return <DataGridTogglableNumberCell context={context} />
+            return (
+              <DataGridTogglableNumberCell
+                context={context}
+                disabledToggleTooltip={t(
+                  "inventory.stock.disabledToggleTooltip"
+                )}
+              />
+            )
           },
         })
       ),

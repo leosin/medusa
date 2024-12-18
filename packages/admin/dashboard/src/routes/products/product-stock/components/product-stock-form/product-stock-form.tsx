@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { HttpTypes } from "@medusajs/types"
-import { Button, toast } from "@medusajs/ui"
-import { useMemo, useRef } from "react"
+import { Button, toast, usePrompt } from "@medusajs/ui"
+import { useMemo, useRef, useState } from "react"
 import { DefaultValues, useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 import { DataGrid } from "../../../../../components/data-grid"
@@ -37,6 +37,9 @@ export const ProductStockForm = ({
   const { t } = useTranslation()
   const { setCloseOnEscape } = useRouteModal()
   const { handleSuccess } = useRouteModal()
+  const prompt = usePrompt()
+
+  const [isPromptOpen, setIsPromptOpen] = useState(false)
 
   const form = useForm<ProductStockSchema>({
     defaultValues: getDefaultValue(variants as any, locations),
@@ -103,9 +106,28 @@ export const ProductStockForm = ({
       }
     }
 
+    if (payload.delete.length > 0) {
+      setIsPromptOpen(true)
+      const confirm = await prompt({
+        title: t("general.areYouSure"),
+        description: t("inventory.stock.disablePrompt", {
+          count: payload.delete.length,
+        }),
+        confirmText: t("actions.continue"),
+        cancelText: t("actions.cancel"),
+        variant: "confirmation",
+      })
+
+      setIsPromptOpen(false)
+
+      if (!confirm) {
+        return
+      }
+    }
+
     await mutateAsync(payload, {
       onSuccess: () => {
-        toast.success(t("products.stock.successToast"))
+        toast.success(t("inventory.stock.successToast"))
         handleSuccess()
       },
       onError: (error) => {
@@ -125,6 +147,7 @@ export const ProductStockForm = ({
             data={variants}
             getSubRows={getSubRows}
             onEditingChange={(editing) => setCloseOnEscape(!editing)}
+            disableInteractions={isPending || isPromptOpen}
           />
         </RouteFocusModal.Body>
         <RouteFocusModal.Footer>

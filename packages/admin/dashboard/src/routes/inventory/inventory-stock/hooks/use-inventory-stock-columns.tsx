@@ -1,5 +1,6 @@
 import { HttpTypes } from "@medusajs/types"
 import { useMemo } from "react"
+import { useTranslation } from "react-i18next"
 import { createDataGridHelper } from "../../../../components/data-grid"
 import { DataGridReadOnlyCell } from "../../../../components/data-grid/components"
 import { DataGridTogglableNumberCell } from "../../../../components/data-grid/components/data-grid-toggleable-number-cell"
@@ -13,6 +14,8 @@ const helper = createDataGridHelper<
 export const useInventoryStockColumns = (
   locations: HttpTypes.AdminStockLocation[] = []
 ) => {
+  const { t } = useTranslation()
+
   return useMemo(
     () => [
       helper.column({
@@ -56,11 +59,18 @@ export const useInventoryStockColumns = (
           },
           type: "togglable-number",
           cell: (context) => {
-            return <DataGridTogglableNumberCell context={context} />
+            return (
+              <DataGridTogglableNumberCell
+                context={context}
+                disabledToggleTooltip={t(
+                  "inventory.stock.disabledToggleTooltip"
+                )}
+              />
+            )
           },
         })
       ),
     ],
-    [locations]
+    [locations, t]
   )
 }

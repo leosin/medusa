@@ -169,6 +169,11 @@ function setValue<
         ? Number(newValue.quantity)
         : null
 
+    // TODO:
+    // 1. Tag højde for den nye værdis checked felt.
+    // 2. Hvis et felt bliver unchecked, så burde vi fjerne quantity, og istedet vise "Not available"
+    // 3. Hvis du sætter quantity til "", på et felt der har disabledToggle, så bør vi rette quantity til 0.
+
     // Determine if checked should be updated
     let newChecked = currentChecked
     if (!disabledToggle) {

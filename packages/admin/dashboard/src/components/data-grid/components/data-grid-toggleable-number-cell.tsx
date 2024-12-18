@@ -10,11 +10,13 @@ import { DataGridCellContainer } from "./data-grid-cell-container"
 
 export const DataGridTogglableNumberCell = <TData, TValue = any>({
   context,
+  disabledToggleTooltip,
   ...rest
 }: DataGridCellProps<TData, TValue> & {
   min?: number
   max?: number
   placeholder?: string
+  disabledToggleTooltip?: string
 }) => {
   const { field, control, renderProps } = useDataGridCell({
     context,
@@ -37,6 +39,7 @@ export const DataGridTogglableNumberCell = <TData, TValue = any>({
                 field={field}
                 inputProps={input}
                 isAnchor={container.isAnchor}
+                tooltip={disabledToggleTooltip}
               />
             }
           >
@@ -52,10 +55,12 @@ const OuterComponent = ({
   field,
   inputProps,
   isAnchor,
+  tooltip,
 }: {
   field: ControllerRenderProps<any, string>
   inputProps: InputProps
   isAnchor: boolean
+  tooltip?: string
 }) => {
   const buttonRef = useRef<HTMLButtonElement>(null)
   const { value } = field
@@ -87,8 +92,8 @@ const OuterComponent = ({
 
   return (
     <ConditionalTooltip
-      showTooltip={localValue.disabledToggle}
-      content={`Cannot disable: clear incoming and/or reserved quantities first.`}
+      showTooltip={localValue.disabledToggle && tooltip}
+      content={tooltip}
     >
       <div className="absolute inset-y-0 left-4 z-[3] flex w-fit items-center justify-center">
         <Switch
@@ -142,9 +147,14 @@ const Inner = ({
 
     /**
      * If the value is not empty, then the location should be enabled.
+     *
+     * Else, if the value is empty and the location is enabled, then the
+     * location should be disabled, unless toggling the location is disabled.
      */
     if (ensuredValue !== "") {
       newValue.checked = true
+    } else if (newValue.checked && newValue.disabledToggle === false) {
+      newValue.checked = false
     }
 
     setLocalValue(newValue)
