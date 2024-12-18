@@ -74,6 +74,15 @@ const OuterComponent = ({
 
   const handleCheckedChange = (update: boolean) => {
     const newValue = { ...localValue, checked: update }
+
+    if (!update && !newValue.disabledToggle) {
+      newValue.quantity = ""
+    }
+
+    if (update && newValue.quantity === "") {
+      newValue.quantity = 0
+    }
+
     setLocalValue(newValue)
     onChange(newValue, value)
   }
@@ -112,6 +121,7 @@ const OuterComponent = ({
 const Inner = ({
   field,
   inputProps,
+  placeholder,
   ...props
 }: {
   field: ControllerRenderProps<any, string>
@@ -160,6 +170,14 @@ const Inner = ({
     setLocalValue(newValue)
   }
 
+  const handleOnChange = () => {
+    if (localValue.disabledToggle && localValue.quantity === "") {
+      localValue.quantity = 0
+    }
+
+    onChange(localValue, value)
+  }
+
   return (
     <div className="flex size-full items-center gap-x-2">
       <CurrencyInput
@@ -174,13 +192,13 @@ const Inner = ({
         onBlur={() => {
           onBlur()
           onInputBlur()
-
-          onChange(localValue, value)
+          handleOnChange()
         }}
         onFocus={onFocus}
         decimalsLimit={0}
         autoComplete="off"
         tabIndex={-1}
+        placeholder={!localValue.checked ? placeholder : undefined}
       />
     </div>
   )

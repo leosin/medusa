@@ -146,60 +146,51 @@ function setValue<
   field: string,
   newValue: T,
   type: string,
-  /**
-   * If an value is being set by a history command, we should not check
-   * for any conditions whether the value is allowed to be changed.
-   */
   isHistory?: boolean
 ) {
-  const currentValue = get(currentValues, field)
-
-  if (type === "togglable-number") {
-    if (isHistory) {
-      set(currentValues, `${field}.quantity`, newValue.quantity)
-      set(currentValues, `${field}.checked`, newValue.checked)
-      return
-    }
-
-    const currentChecked = currentValue.checked
-    const disabledToggle = currentValue.disabledToggle
-
-    const newQuantityNumber =
-      newValue.quantity != null && newValue.quantity !== ""
-        ? Number(newValue.quantity)
-        : null
-
-    // TODO:
-    // 1. Tag højde for den nye værdis checked felt.
-    // 2. Hvis et felt bliver unchecked, så burde vi fjerne quantity, og istedet vise "Not available"
-    // 3. Hvis du sætter quantity til "", på et felt der har disabledToggle, så bør vi rette quantity til 0.
-
-    // Determine if checked should be updated
-    let newChecked = currentChecked
-    if (!disabledToggle) {
-      if (
-        currentChecked === false &&
-        newQuantityNumber != null &&
-        newQuantityNumber > 0
-      ) {
-        newChecked = true
-      }
-
-      if (currentChecked === true && !newQuantityNumber) {
-        newChecked = false
-      }
-    }
-
-    set(currentValues, field, {
-      ...currentValue,
-      quantity: newValue.quantity,
-      checked: newChecked,
-    })
-
+  if (type !== "togglable-number") {
+    set(currentValues, field, newValue)
     return
   }
 
-  set(currentValues, field, newValue)
+  setValueToggleableNumber(currentValues, field, newValue, isHistory)
+}
+
+function setValueToggleableNumber(
+  currentValues: any,
+  field: string,
+  newValue: DataGridToggleableNumber,
+  isHistory?: boolean
+) {
+  const currentValue = get(currentValues, field)
+  const { disabledToggle } = currentValue
+
+  const normalizeQuantity = (value: number | string | null | undefined) => {
+    if (disabledToggle && value === "") {
+      return 0
+    }
+    return value
+  }
+
+  const determineChecked = (quantity: number | string | null | undefined) => {
+    if (disabledToggle) {
+      return true
+    }
+    return quantity !== "" && quantity != null
+  }
+
+  const quantity = normalizeQuantity(newValue.quantity)
+  const checked = isHistory
+    ? disabledToggle
+      ? true
+      : newValue.checked
+    : determineChecked(quantity)
+
+  set(currentValues, field, {
+    ...currentValue,
+    quantity,
+    checked,
+  })
 }
 
 export function convertArrayToPrimitive(

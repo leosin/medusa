@@ -255,7 +255,14 @@ export const useDataGridKeydownEvent = <
       createSnapshot(anchor)
 
       const current = getValues(field as Path<TFieldValues>)
-      const next = { ...current, quantity: "" }
+      let checked = current.checked
+
+      // If the toggle is not disabled, then we want to uncheck the toggle.
+      if (!current.disabledToggle) {
+        checked = false
+      }
+
+      const next = { ...current, quantity: "", checked }
 
       const command = new DataGridUpdateCommand({
         next,

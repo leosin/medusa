@@ -211,6 +211,7 @@ export const useProductStockColumns = (
                 disabledToggleTooltip={t(
                   "inventory.stock.disabledToggleTooltip"
                 )}
+                placeholder="Not available"
               />
             )
           },
