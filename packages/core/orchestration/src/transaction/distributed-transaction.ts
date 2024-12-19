@@ -9,6 +9,7 @@ import {
   TransactionHandlerType,
   TransactionState,
 } from "./types"
+import { NonSerializableCheckPointError } from "./errors"
 
 /**
  * @typedef TransactionMetadata
@@ -204,19 +205,14 @@ class DistributedTransaction extends EventEmitter {
       return
     }
 
-    const data = new TransactionCheckpoint(
-      this.getFlow(),
-      this.getContext(),
-      this.getErrors()
-    )
-
     const key = TransactionOrchestrator.getKeyName(
       DistributedTransaction.keyPrefix,
       this.modelId,
       this.transactionId
     )
 
-    const rawData = JSON.parse(JSON.stringify(data))
+    const rawData = this.#serializeCheckpoint()
+
     await DistributedTransaction.keyValueStore.save(key, rawData, ttl, options)
 
     return rawData
@@ -319,6 +315,65 @@ class DistributedTransaction extends EventEmitter {
 
   public hasTemporaryData(key: string) {
     return this.#temporaryStorage.has(key)
+  }
+
+  #serializeCheckpoint() {
+    const data = new TransactionCheckpoint(
+      this.getFlow(),
+      this.getContext(),
+      this.getErrors()
+    )
+
+    const isSerializable = (obj) => {
+      try {
+        JSON.parse(JSON.stringify(obj))
+        return true
+      } catch {
+        return false
+      }
+    }
+
+    let rawData
+    try {
+      rawData = JSON.parse(JSON.stringify(data))
+    } catch (e) {
+      if (!isSerializable(this.context)) {
+        throw new NonSerializableCheckPointError(
+          "Unable to serialize context object. Please make sure the workflow input and steps response are serializable."
+        )
+      }
+
+      if (!isSerializable(this.errors)) {
+        const nonSerializableErrors: TransactionStepError[] = []
+        for (const error of this.errors) {
+          if (!isSerializable(error.error)) {
+            error.error = {
+              name: error.error.name,
+              message: error.error.message,
+              stack: error.error.stack,
+            }
+            nonSerializableErrors.push({
+              ...error,
+              error: e,
+            })
+          }
+        }
+
+        if (nonSerializableErrors.length) {
+          this.errors.push(...nonSerializableErrors)
+        }
+      }
+
+      const data = new TransactionCheckpoint(
+        this.getFlow(),
+        this.getContext(),
+        this.getErrors()
+      )
+
+      rawData = JSON.parse(JSON.stringify(data))
+    }
+
+    return rawData
   }
 }
 
