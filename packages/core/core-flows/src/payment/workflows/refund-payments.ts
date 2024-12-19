@@ -8,6 +8,7 @@ import {
   WorkflowResponse,
 } from "@medusajs/framework/workflows-sdk"
 import { useQueryGraphStep } from "../../common"
+import { addOrderTransactionStep } from "../../order"
 import { refundPaymentsStep } from "../steps/refund-payments"
 
 type RefundPaymentsInput = {
@@ -71,10 +72,13 @@ export const refundPaymentsWorkflow = createWorkflow(
       entity: "payments",
       fields: [
         "id",
+        "currency_code",
         "refunds.id",
         "refunds.amount",
         "captures.id",
         "captures.amount",
+        "payment_collection.order.id",
+        "payment_collection.order.currency_code",
       ],
       filters: { id: paymentIds },
       options: { throwIfKeyNotFound: true },
@@ -88,6 +92,37 @@ export const refundPaymentsWorkflow = createWorkflow(
     validatePaymentsRefundStep({ payments, input })
 
     const refundedPayments = refundPaymentsStep(input)
+
+    const orderTransactionData = transform(
+      { payments, input },
+      ({ payments, input }) => {
+        const paymentsMap: Record<
+          string,
+          PaymentDTO & {
+            payment_collection: { order: { id: string; currency_code: string } }
+          }
+        > = {}
+
+        for (const payment of payments) {
+          paymentsMap[payment.id] = payment
+        }
+
+        return input.map((paymentInput) => {
+          const payment = paymentsMap[paymentInput.payment_id]!
+          const order = payment.payment_collection.order
+
+          return {
+            order_id: order.id,
+            amount: MathBN.mult(paymentInput.amount, -1),
+            currency_code: payment.currency_code,
+            reference_id: payment.id,
+            reference: "refund",
+          }
+        })
+      }
+    )
+
+    addOrderTransactionStep(orderTransactionData)
 
     return new WorkflowResponse(refundedPayments)
   }

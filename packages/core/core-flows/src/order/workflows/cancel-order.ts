@@ -148,11 +148,7 @@ export const cancelOrderWorkflow = createWorkflow(
       },
     })
 
-    refundCapturedPaymentsWorkflow.runAsStep({
-      input: { order_id: order.id },
-    })
-
-    const paymentIds = transform({ payments }, ({ payments }) => {
+    const uncapturedPaymentIds = transform({ payments }, ({ payments }) => {
       return payments.uncapturedPayments.map((payment) => payment.id)
     })
 
@@ -162,7 +158,10 @@ export const cancelOrderWorkflow = createWorkflow(
 
     parallelize(
       deleteReservationsByLineItemsStep(lineItemIds),
-      cancelPaymentStep({ paymentIds }),
+      cancelPaymentStep({ paymentIds: uncapturedPaymentIds }),
+      refundCapturedPaymentsWorkflow.runAsStep({
+        input: { order_id: order.id },
+      }),
       cancelOrdersStep({ orderIds: [order.id] }),
       emitEventStep({
         eventName: OrderWorkflowEvents.CANCELED,
@@ -170,8 +169,24 @@ export const cancelOrderWorkflow = createWorkflow(
       })
     )
 
+    // TODO: Remove after confirming summaries
+    const orderQuery2 = useQueryGraphStep({
+      entity: "orders",
+      fields: ["id", "summary"],
+      filters: { id: input.order_id },
+      options: { throwIfKeyNotFound: true },
+    }).config({ name: "get-cart2" })
+
+    const order2 = transform({ orderQuery2 }, ({ orderQuery2 }) => {
+      console.log(
+        "orderQuery2 - ",
+        JSON.stringify(orderQuery2.data[0].summary, null, 4)
+      )
+      return orderQuery2.data[0]
+    })
+
     const orderCanceled = createHook("orderCanceled", {
-      order,
+      order: order2,
     })
 
     return new WorkflowResponse(void 0, {

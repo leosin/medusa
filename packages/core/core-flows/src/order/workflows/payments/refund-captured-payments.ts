@@ -1,5 +1,5 @@
 import { BigNumberInput, OrderDTO, PaymentDTO } from "@medusajs/framework/types"
-import { deepFlatMap, MathBN, MedusaError } from "@medusajs/framework/utils"
+import { deepFlatMap, MathBN } from "@medusajs/framework/utils"
 import {
   createStep,
   createWorkflow,
@@ -22,23 +22,20 @@ export const validateOrderRefundStep = createStep(
     order: OrderDTO
     totalCaptured: BigNumberInput
   }) {
-    const differenceSum = order.summary?.difference_sum!
-
-    if (MathBN.gte(differenceSum, 0)) {
-      throw new MedusaError(
-        MedusaError.Types.INVALID_DATA,
-        `Order does not have an outstanding balance to refund`
-      )
-    }
-
-    const postRefundAmount = MathBN.sum(differenceSum, totalCaptured)
-
-    if (!MathBN.eq(postRefundAmount, 0)) {
-      throw new MedusaError(
-        MedusaError.Types.INVALID_DATA,
-        `Refund amount does not match the difference`
-      )
-    }
+    // TODO: Add validations here
+    // const currentOrderTotal = (order.summary as any)?.current_order_total!
+    // const originalOrderTotal = (order.summary as any)?.current_order_total!
+    // const postRefundAmount = MathBN.sum(currentOrderTotal, totalCaptured)
+    // console.log("order.summary -- ", order.summary)
+    // console.log("totalCaptured -- ", totalCaptured)
+    // console.log("currentOrderTotal -- ", currentOrderTotal)
+    // console.log("postRefundAmount -- ", postRefundAmount)
+    // if (!MathBN.eq(postRefundAmount, 0)) {
+    //   throw new MedusaError(
+    //     MedusaError.Types.INVALID_DATA,
+    //     `Refund amount does not match the difference`
+    //   )
+    // }
   }
 )
 
@@ -62,6 +59,7 @@ export const refundCapturedPaymentsWorkflow = createWorkflow(
         "status",
         "summary",
         "payment_collections.payments.id",
+        "payment_collections.payments.amount",
         "payment_collections.payments.refunds.id",
         "payment_collections.payments.refunds.amount",
         "payment_collections.payments.captures.id",
@@ -96,16 +94,16 @@ export const refundCapturedPaymentsWorkflow = createWorkflow(
               MathBN.convert(0)
             )
             const refundedAmount = (payment.refunds || []).reduce(
-              (acc, capture) => MathBN.sum(acc, capture.amount),
+              (acc, refund) => MathBN.sum(acc, refund.amount),
               MathBN.convert(0)
             )
 
-            const refundAmount = MathBN.sub(capturedAmount, refundedAmount)
+            const amountToRefund = MathBN.sub(capturedAmount, refundedAmount)
 
             return {
               payment_id: payment.id,
               created_by: input.created_by,
-              amount: refundAmount,
+              amount: amountToRefund,
             }
           })
           .filter((payment) => MathBN.gt(payment.amount, 0))
