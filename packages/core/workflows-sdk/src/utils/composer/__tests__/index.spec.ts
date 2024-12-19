@@ -43,7 +43,7 @@ describe("Workflow composer", () => {
       expect(result).toEqual({ result: "hi from outside" })
     })
 
-    it.only("should cancel transaction on failed sub workflow call", async function () {
+    it("should cancel transaction on failed sub workflow call", async function () {
       const step1 = createStep("step1", async (_, context) => {
         return new StepResponse("step1")
       })

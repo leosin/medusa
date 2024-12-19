@@ -211,7 +211,7 @@ class DistributedTransaction extends EventEmitter {
       this.transactionId
     )
 
-    const rawData = this.#serializeCheckpoint()
+    const rawData = this.#serializeCheckpointData()
 
     await DistributedTransaction.keyValueStore.save(key, rawData, ttl, options)
 
@@ -317,7 +317,7 @@ class DistributedTransaction extends EventEmitter {
     return this.#temporaryStorage.has(key)
   }
 
-  #serializeCheckpoint() {
+  #serializeCheckpointData() {
     const data = new TransactionCheckpoint(
       this.getFlow(),
       this.getContext(),
