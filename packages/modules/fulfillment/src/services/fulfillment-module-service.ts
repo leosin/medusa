@@ -17,6 +17,7 @@ import {
   SoftDeleteReturn,
   UpdateFulfillmentSetDTO,
   UpdateServiceZoneDTO,
+  ValidateFulfillmentDataContext,
 } from "@medusajs/framework/types"
 import {
   arrayDifference,
@@ -2002,7 +2003,7 @@ export default class FulfillmentModuleService
     providerId: string,
     optionData: Record<string, unknown>,
     data: Record<string, unknown>,
-    context: Record<string, unknown>
+    context: ValidateFulfillmentDataContext
   ): Promise<Record<string, unknown>> {
     return await this.fulfillmentProviderService_.validateFulfillmentData(
       providerId,
@@ -2012,6 +2013,7 @@ export default class FulfillmentModuleService
     )
   }
 
+  // TODO: seems not to be used, what is the purpose of this method?
   async validateFulfillmentOption(
     providerId: string,
     data: Record<string, unknown>

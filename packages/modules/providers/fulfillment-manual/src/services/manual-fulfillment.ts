@@ -1,7 +1,9 @@
 import { AbstractFulfillmentProviderService } from "@medusajs/framework/utils"
 import {
   CalculatedShippingOptionPrice,
+  CalculateShippingOptionPriceContext,
   FulfillmentOption,
+  ValidateFulfillmentDataContext,
 } from "@medusajs/types"
 
 // TODO rework type and DTO's
@@ -28,7 +30,7 @@ export class ManualFulfillmentService extends AbstractFulfillmentProviderService
   async validateFulfillmentData(
     optionData: Record<string, unknown>,
     data: Record<string, unknown>,
-    context: Record<string, unknown>
+    context: ValidateFulfillmentDataContext
   ): Promise<any> {
     return data
   }
@@ -36,7 +38,7 @@ export class ManualFulfillmentService extends AbstractFulfillmentProviderService
   async calculatePrice(
     optionData: Record<string, unknown>,
     data: Record<string, unknown>,
-    context: Record<string, unknown>
+    context: CalculateShippingOptionPriceContext
   ): Promise<CalculatedShippingOptionPrice> {
     throw new Error("Manual fulfillment does not support price calculation")
   }

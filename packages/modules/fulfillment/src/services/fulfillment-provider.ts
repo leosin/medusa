@@ -2,10 +2,12 @@ import {
   CalculateShippingOptionPriceDTO,
   Constructor,
   DAL,
+  FulfillmentDTO,
   FulfillmentOption,
   FulfillmentTypes,
   IFulfillmentProvider,
   Logger,
+  ValidateFulfillmentDataContext,
 } from "@medusajs/framework/types"
 import {
   MedusaError,
@@ -91,7 +93,7 @@ export default class FulfillmentProviderService extends ModulesSdkUtils.MedusaIn
     providerId: string,
     optionData: Record<string, unknown>,
     data: Record<string, unknown>,
-    context: Record<string, unknown>
+    context: ValidateFulfillmentDataContext
   ) {
     const provider = this.retrieveProviderRegistration(providerId)
     return await provider.validateFulfillmentData(optionData, data, context)

@@ -1,4 +1,9 @@
-import { CalculateShippingOptionPriceDTO } from "./mutations"
+import { StockLocationDTO } from "../stock-location"
+import { CartPropsForFulfillment } from "./common"
+import {
+  CalculateShippingOptionPriceContext,
+  CalculateShippingOptionPriceDTO,
+} from "./mutations"
 
 export type FulfillmentOption = {
   /**
@@ -28,6 +33,11 @@ export type CalculatedShippingOptionPrice = {
   is_calculated_price_tax_inclusive: boolean
 }
 
+export type ValidateFulfillmentDataContext = CartPropsForFulfillment & {
+  from_location: StockLocationDTO
+  [k: string]: unknown
+}
+
 export interface IFulfillmentProvider {
   /**
    *
@@ -46,11 +56,13 @@ export interface IFulfillmentProvider {
   validateFulfillmentData(
     optionData: Record<string, unknown>,
     data: Record<string, unknown>,
-    context: Record<string, unknown>
+    context: ValidateFulfillmentDataContext
   ): Promise<any>
   /**
    *
    * Validate the given option.
+   *
+   * TODO: seems not to be used, called from `fulfillmentModuleService.validateFulfillmentOption`?
    */
   validateOption(data: Record<string, unknown>): Promise<boolean>
   /**
@@ -65,7 +77,7 @@ export interface IFulfillmentProvider {
   calculatePrice(
     optionData: CalculateShippingOptionPriceDTO["optionData"],
     data: CalculateShippingOptionPriceDTO["data"],
-    context: CalculateShippingOptionPriceDTO["context"]
+    context: CalculateShippingOptionPriceContext
   ): Promise<CalculatedShippingOptionPrice>
   /**
    *
