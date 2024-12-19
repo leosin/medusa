@@ -4,7 +4,7 @@ import { stringify } from "yaml"
 import { replaceTemplateVariables } from "../../utils/reflection-template-strings"
 import { Reflection } from "typedoc"
 import { FrontmatterData } from "types"
-import { getTagComments, getTagsAsArray } from "utils"
+import { getTagComments, getTagsAsArray, getUniqueStrArray } from "utils"
 
 export default function (theme: MarkdownTheme) {
   Handlebars.registerHelper("frontmatter", function (this: Reflection) {
@@ -29,6 +29,11 @@ export default function (theme: MarkdownTheme) {
       const tagContent = getTagsAsArray(tag)
       resolvedFrontmatter["tags"]?.push(...tagContent)
     })
+    if (resolvedFrontmatter["tags"]?.length) {
+      resolvedFrontmatter["tags"] = getUniqueStrArray(
+        resolvedFrontmatter["tags"]
+      )
+    }
 
     return `---\n${stringify(resolvedFrontmatter).trim()}\n---\n\n`
   })
