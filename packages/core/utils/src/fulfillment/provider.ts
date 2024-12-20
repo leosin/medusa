@@ -204,7 +204,7 @@ export class AbstractFulfillmentProviderService
    * @example
    * class MyFulfillmentProviderService extends AbstractFulfillmentProviderService {
    *   // ...
-   *   async canCalculate(data: src/fulfillment/provider.ts): Promise<boolean> {
+   *   async canCalculate(data: CreateShippingOptionDTO): Promise<boolean> {
    *     // assuming you have a client
    *     return await this.client.hasRates(data.id)
    *   }
