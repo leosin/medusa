@@ -1,6 +1,7 @@
 export * from "./dml-utils"
 export * from "./get-type-children"
 export * from "./get-project-child"
+export * from "./get-resolved-resources"
 export * from "./get-type-str"
 export * from "./hooks-util"
 export * from "./step-utils"
