@@ -3,8 +3,11 @@ import {
   CalculateShippingOptionPriceDTO,
   CreateFulfillmentResult,
   CreateShippingOptionDTO,
+  FulfillmentDTO,
+  FulfillmentItemDTO,
   FulfillmentOption,
   IFulfillmentProvider,
+  OrderDTO,
   ValidateFulfillmentDataContext,
 } from "@medusajs/types"
 
@@ -291,10 +294,10 @@ export class AbstractFulfillmentProviderService
    * }
    */
   async createFulfillment(
-    data: object,
-    items: object[],
-    order: object | undefined,
-    fulfillment: Record<string, unknown>
+    data: Record<string, unknown>,
+    items: Partial<Omit<FulfillmentItemDTO, "fulfillment">>[],
+    order: Partial<OrderDTO> | undefined,
+    fulfillment: Partial<Omit<FulfillmentDTO, "provider_id" | "data" | "items">>
   ): Promise<CreateFulfillmentResult> {
     throw Error("createFulfillment must be overridden by the child class")
   }

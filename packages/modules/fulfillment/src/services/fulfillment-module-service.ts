@@ -651,7 +651,7 @@ export default class FulfillmentModuleService
           fulfillmentData || {},
           items.map((i) => i),
           order,
-          fulfillmentRest
+          fulfillmentRest as unknown as Partial<FulfillmentDTO>
         )
       await this.fulfillmentService_.update(
         {

@@ -1,5 +1,10 @@
+import { OrderDTO } from "../order"
 import { StockLocationDTO } from "../stock-location"
-import { CartPropsForFulfillment } from "./common"
+import {
+  CartPropsForFulfillment,
+  FulfillmentDTO,
+  FulfillmentItemDTO,
+} from "./common"
 import {
   CalculateShippingOptionPriceContext,
   CalculateShippingOptionPriceDTO,
@@ -111,10 +116,10 @@ export interface IFulfillmentProvider {
    * Create a fulfillment for the given data.
    */
   createFulfillment(
-    data: object,
-    items: object[],
-    order: object | undefined,
-    fulfillment: Record<string, unknown>
+    data: Record<string, unknown>,
+    items: Partial<Omit<FulfillmentItemDTO, "fulfillment">>[],
+    order: Partial<OrderDTO> | undefined,
+    fulfillment: Partial<Omit<FulfillmentDTO, "provider_id" | "data" | "items">>
   ): Promise<CreateFulfillmentResult>
   /**
    *

@@ -4,10 +4,13 @@ import {
   CreateFulfillmentResult,
   CreateShippingOptionDTO,
   DAL,
+  FulfillmentDTO,
+  FulfillmentItemDTO,
   FulfillmentOption,
   FulfillmentTypes,
   IFulfillmentProvider,
   Logger,
+  OrderDTO,
   ValidateFulfillmentDataContext,
 } from "@medusajs/framework/types"
 import {
@@ -122,10 +125,10 @@ export default class FulfillmentProviderService extends ModulesSdkUtils.MedusaIn
 
   async createFulfillment(
     providerId: string,
-    data: object,
-    items: object[],
-    order: object | undefined,
-    fulfillment: Record<string, unknown>
+    data: Record<string, unknown>,
+    items: Partial<Omit<FulfillmentItemDTO, "fulfillment">>[],
+    order: Partial<OrderDTO> | undefined,
+    fulfillment: Partial<Omit<FulfillmentDTO, "provider_id" | "data" | "items">>
   ): Promise<CreateFulfillmentResult> {
     const provider = this.retrieveProviderRegistration(providerId)
     return await provider.createFulfillment(data, items, order, fulfillment)
