@@ -1,6 +1,7 @@
 import {
   CalculatedShippingOptionPrice,
   CalculateShippingOptionPriceDTO,
+  CreateShippingOptionDTO,
   FulfillmentOption,
   IFulfillmentProvider,
   ValidateFulfillmentDataContext,
@@ -199,13 +200,13 @@ export class AbstractFulfillmentProviderService
    * @example
    * class MyFulfillmentProviderService extends AbstractFulfillmentProviderService {
    *   // ...
-   *   async canCalculate(data: Record<string, unknown>): Promise<boolean> {
+   *   async canCalculate(data: src/fulfillment/provider.ts): Promise<boolean> {
    *     // assuming you have a client
    *     return await this.client.hasRates(data.id)
    *   }
    * }
    */
-  async canCalculate(data: Record<string, unknown>): Promise<boolean> {
+  async canCalculate(data: CreateShippingOptionDTO): Promise<boolean> {
     throw Error("canCalculate must be overridden by the child class")
   }
 

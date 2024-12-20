@@ -2060,10 +2060,7 @@ export default class FulfillmentModuleService
     }
 
     const promises = shippingOptionsData.map((option) =>
-      this.fulfillmentProviderService_.canCalculate(
-        option.provider_id,
-        option as unknown as Record<string, unknown>
-      )
+      this.fulfillmentProviderService_.canCalculate(option.provider_id, option)
     )
 
     return await promiseAll(promises)

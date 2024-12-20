@@ -1,6 +1,7 @@
 import {
   CalculateShippingOptionPriceDTO,
   Constructor,
+  CreateShippingOptionDTO,
   DAL,
   FulfillmentOption,
   FulfillmentTypes,
@@ -103,7 +104,7 @@ export default class FulfillmentProviderService extends ModulesSdkUtils.MedusaIn
     return await provider.validateOption(data)
   }
 
-  async canCalculate(providerId: string, data: Record<string, unknown>) {
+  async canCalculate(providerId: string, data: CreateShippingOptionDTO) {
     const provider = this.retrieveProviderRegistration(providerId)
     return await provider.canCalculate(data)
   }

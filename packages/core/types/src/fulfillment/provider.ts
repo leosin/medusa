@@ -3,6 +3,7 @@ import { CartPropsForFulfillment } from "./common"
 import {
   CalculateShippingOptionPriceContext,
   CalculateShippingOptionPriceDTO,
+  CreateShippingOptionDTO,
 } from "./mutations"
 
 export type FulfillmentOption = {
@@ -69,7 +70,7 @@ export interface IFulfillmentProvider {
    *
    * Check if the provider can calculate the fulfillment price.
    */
-  canCalculate(data: Record<string, unknown>): Promise<boolean>
+  canCalculate(data: CreateShippingOptionDTO): Promise<boolean>
   /**
    *
    * Calculate the price for the given fulfillment option.
