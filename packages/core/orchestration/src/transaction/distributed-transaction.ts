@@ -317,6 +317,14 @@ class DistributedTransaction extends EventEmitter {
     return this.#temporaryStorage.has(key)
   }
 
+  /**
+   * Try to serialize the checkpoint data
+   * If it fails, it means that the context or the errors are not serializable
+   * and we should handle it
+   *
+   * @internal
+   * @returns
+   */
   #serializeCheckpointData() {
     const data = new TransactionCheckpoint(
       this.getFlow(),
@@ -338,6 +346,9 @@ class DistributedTransaction extends EventEmitter {
       rawData = JSON.parse(JSON.stringify(data))
     } catch (e) {
       if (!isSerializable(this.context)) {
+        // This is a safe guard, we should never reach this point
+        // If we do, it means that the context is not serializable
+        // and we should throw an error
         throw new NonSerializableCheckPointError(
           "Unable to serialize context object. Please make sure the workflow input and steps response are serializable."
         )
