@@ -711,11 +711,22 @@ export default class FulfillmentModuleService
       sharedContext
     )
 
+    const shippingOption = await this.shippingOptionService_.retrieve(
+      fulfillment.shipping_option_id!,
+      {
+        select: ["id", "name", "data", "metadata"],
+      },
+      sharedContext
+    )
+
     try {
       const providerResult =
         await this.fulfillmentProviderService_.createReturn(
           fulfillment.provider_id!, // TODO: should we add a runtime check on provider_id being provided?,
-          fulfillment as Record<any, any>
+          {
+            ...fulfillment,
+            shipping_option: shippingOption,
+          } as Record<any, any>
         )
       await this.fulfillmentService_.update(
         {

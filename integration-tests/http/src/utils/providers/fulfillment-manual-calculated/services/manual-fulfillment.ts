@@ -52,6 +52,6 @@ export class ManualFulfillmentService extends AbstractFulfillmentProviderService
   }
 
   async createReturnFulfillment() {
-    return {}
+    return { data: {}, labels: [] }
   }
 }

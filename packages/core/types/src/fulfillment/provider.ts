@@ -135,7 +135,9 @@ export interface IFulfillmentProvider {
    *
    * Create a return for the given data.
    */
-  createReturnFulfillment(fromData: Record<string, unknown>): Promise<any>
+  createReturnFulfillment(
+    fromData: Record<string, unknown>
+  ): Promise<CreateFulfillmentResult>
   /**
    *
    * Get the documents for the given return data.

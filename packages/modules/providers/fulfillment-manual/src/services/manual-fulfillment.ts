@@ -64,7 +64,10 @@ export class ManualFulfillmentService extends AbstractFulfillmentProviderService
     return {}
   }
 
-  async createReturnFulfillment(): Promise<any> {
-    return {}
+  async createReturnFulfillment(): Promise<CreateFulfillmentResult> {
+    return {
+      data: {},
+      labels: [],
+    }
   }
 }

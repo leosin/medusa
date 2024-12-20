@@ -357,12 +357,12 @@ export class AbstractFulfillmentProviderService
    * purchasing a label for the return fulfillment.
    *
    * @param fulfillment - The fulfillment's details.
-   * @returns An object whose `data` property is stored in the fulfillment's `data` property.
+   * @returns An object containing `data` which is stored in the fulfillment's `data` property and `labels` array which is used to create FulfillmentLabels.
    *
    * @example
    * class MyFulfillmentProviderService extends AbstractFulfillmentProviderService {
    *   // ...
-   *   async createReturnFulfillment(fulfillment: Record<string, unknown>): Promise<any> {
+   *   async createReturnFulfillment(fulfillment: Record<string, unknown>): Promise<CreateFulfillmentResult> {
    *     // assuming the client creates a fulfillment for a return
    *     // in the third-party service
    *     const externalData = await this.client.createReturn(
@@ -380,7 +380,7 @@ export class AbstractFulfillmentProviderService
    */
   async createReturnFulfillment(
     fulfillment: Record<string, unknown>
-  ): Promise<any> {
+  ): Promise<CreateFulfillmentResult> {
     throw Error("createReturn must be overridden by the child class")
   }
 
