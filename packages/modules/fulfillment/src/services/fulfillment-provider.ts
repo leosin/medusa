@@ -2,7 +2,6 @@ import {
   CalculateShippingOptionPriceDTO,
   Constructor,
   DAL,
-  FulfillmentDTO,
   FulfillmentOption,
   FulfillmentTypes,
   IFulfillmentProvider,
