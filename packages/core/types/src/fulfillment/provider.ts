@@ -35,8 +35,34 @@ export type CalculatedShippingOptionPrice = {
 }
 
 export type ValidateFulfillmentDataContext = CartPropsForFulfillment & {
+  /**
+   * Details about the location that items are being shipped from.
+   */
   from_location: StockLocationDTO
   [k: string]: unknown
+}
+
+export type CreateFulfillmentResult = {
+  /**
+   * Additional fulfillment data from provider
+   */
+  data: Record<string, unknown>
+  labels: {
+    /**
+     * The tracking number of the fulfillment label.
+     */
+    tracking_number: string
+
+    /**
+     * The tracking URL of the fulfillment label.
+     */
+    tracking_url: string
+
+    /**
+     * The label's URL.
+     */
+    label_url: string
+  }[]
 }
 
 export interface IFulfillmentProvider {
@@ -89,7 +115,7 @@ export interface IFulfillmentProvider {
     items: object[],
     order: object | undefined,
     fulfillment: Record<string, unknown>
-  ): Promise<Record<string, unknown>>
+  ): Promise<CreateFulfillmentResult>
   /**
    *
    * Cancel the given fulfillment.

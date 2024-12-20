@@ -1,6 +1,7 @@
 import {
   CalculatedShippingOptionPrice,
   CalculateShippingOptionPriceDTO,
+  CreateFulfillmentResult,
   CreateShippingOptionDTO,
   FulfillmentOption,
   IFulfillmentProvider,
@@ -272,7 +273,7 @@ export class AbstractFulfillmentProviderService
    *     items: any,
    *     order: any,
    *     fulfillment: any
-   *   ): Promise<any> {
+   *   ): Promise<CreateFulfillmentResult> {
    *     // assuming the client creates a fulfillment
    *     // in the third-party service
    *     const externalData = await this.client.create(
@@ -294,7 +295,7 @@ export class AbstractFulfillmentProviderService
     items: object[],
     order: object | undefined,
     fulfillment: Record<string, unknown>
-  ): Promise<any> {
+  ): Promise<CreateFulfillmentResult> {
     throw Error("createFulfillment must be overridden by the child class")
   }
 

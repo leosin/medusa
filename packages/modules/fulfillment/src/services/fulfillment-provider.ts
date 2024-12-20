@@ -1,6 +1,7 @@
 import {
   CalculateShippingOptionPriceDTO,
   Constructor,
+  CreateFulfillmentResult,
   CreateShippingOptionDTO,
   DAL,
   FulfillmentOption,
@@ -125,7 +126,7 @@ export default class FulfillmentProviderService extends ModulesSdkUtils.MedusaIn
     items: object[],
     order: object | undefined,
     fulfillment: Record<string, unknown>
-  ): Promise<Record<string, unknown>> {
+  ): Promise<CreateFulfillmentResult> {
     const provider = this.retrieveProviderRegistration(providerId)
     return await provider.createFulfillment(data, items, order, fulfillment)
   }

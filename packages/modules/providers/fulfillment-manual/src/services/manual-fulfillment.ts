@@ -2,6 +2,7 @@ import { AbstractFulfillmentProviderService } from "@medusajs/framework/utils"
 import {
   CalculatedShippingOptionPrice,
   CalculateShippingOptionPriceContext,
+  CreateFulfillmentResult,
   FulfillmentOption,
   ValidateFulfillmentDataContext,
 } from "@medusajs/types"
@@ -51,9 +52,12 @@ export class ManualFulfillmentService extends AbstractFulfillmentProviderService
     return true
   }
 
-  async createFulfillment(): Promise<Record<string, any>> {
+  async createFulfillment(): Promise<CreateFulfillmentResult> {
     // No data is being sent anywhere
-    return {}
+    return {
+      data: {},
+      labels: [],
+    }
   }
 
   async cancelFulfillment(): Promise<any> {
