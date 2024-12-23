@@ -1779,6 +1779,14 @@ export const generatedSidebar = [
                 "path": "/references/fulfillment/provider",
                 "title": "Create Fulfillment Provider Module",
                 "children": []
+              },
+              {
+                "loaded": true,
+                "isPathHref": true,
+                "type": "link",
+                "path": "/integrations/guides/shipstation",
+                "title": "Integrate ShipStation",
+                "children": []
               }
             ]
           },
@@ -8084,6 +8092,22 @@ export const generatedSidebar = [
             "type": "link",
             "path": "/architectural-modules/file/s3",
             "title": "AWS",
+            "children": []
+          }
+        ]
+      },
+      {
+        "loaded": true,
+        "isPathHref": true,
+        "type": "category",
+        "title": "Fulfillment",
+        "children": [
+          {
+            "loaded": true,
+            "isPathHref": true,
+            "type": "link",
+            "path": "/integrations/guides/shipstation",
+            "title": "ShipStation",
             "children": []
           }
         ]

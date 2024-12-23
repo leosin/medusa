@@ -575,6 +575,11 @@ export const sidebar = sidebarAttachHrefCommonOptions([
                 path: "/references/fulfillment/provider",
                 title: "Create Fulfillment Provider Module",
               },
+              {
+                type: "link",
+                path: "/integrations/guides/shipstation",
+                title: "Integrate ShipStation",
+              },
             ],
           },
           {
@@ -1791,6 +1796,17 @@ export const sidebar = sidebarAttachHrefCommonOptions([
             type: "link",
             path: "/architectural-modules/file/s3",
             title: "AWS",
+          },
+        ],
+      },
+      {
+        type: "category",
+        title: "Fulfillment",
+        children: [
+          {
+            type: "link",
+            path: "/integrations/guides/shipstation",
+            title: "ShipStation",
           },
         ],
       },

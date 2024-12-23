@@ -725,6 +725,8 @@ paths:
     $ref: paths/admin_exchanges_{id}_request.yaml
   /admin/fulfillment-providers:
     $ref: paths/admin_fulfillment-providers.yaml
+  /admin/fulfillment-providers/{id}/options:
+    $ref: paths/admin_fulfillment-providers_{id}_options.yaml
   /admin/fulfillment-sets/{id}:
     $ref: paths/admin_fulfillment-sets_{id}.yaml
   /admin/fulfillment-sets/{id}/service-zones:
