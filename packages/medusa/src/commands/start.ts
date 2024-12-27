@@ -138,6 +138,12 @@ async function start(args: {
       }
 
       const serverActivity = logger.activity(`Creating server`)
+
+      // Register a health check endpoint. Ideally this also checks the readiness of the service, rather than just returning a static response.
+      app.get("/health", (_, res) => {
+        res.status(200).send("OK")
+      })
+
       const server = GracefulShutdownServer.create(
         http_.listen(port, host).on("listening", () => {
           logger.success(

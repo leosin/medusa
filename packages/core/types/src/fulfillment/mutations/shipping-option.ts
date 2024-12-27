@@ -87,7 +87,7 @@ export interface UpdateShippingOptionDTO {
   /**
    * The shipping option type associated with the shipping option.
    */
-  type:
+  type?:
     | Omit<CreateShippingOptionTypeDTO, "shipping_option_id">
     | {
         /**

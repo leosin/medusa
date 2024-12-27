@@ -48,6 +48,8 @@ import {
  *
  *     this.logger_ = logger
  *     this.options_ = options
+ * 
+ *     // TODO initialize your client
  *   }
  * }
  *

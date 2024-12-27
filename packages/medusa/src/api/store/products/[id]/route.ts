@@ -6,11 +6,10 @@ import {
   RequestWithContext,
   wrapProductsWithTaxPrices,
 } from "../helpers"
-import { StoreGetProductParamsType } from "../validators"
 import { HttpTypes } from "@medusajs/framework/types"
 
 export const GET = async (
-  req: RequestWithContext<StoreGetProductParamsType>,
+  req: RequestWithContext<HttpTypes.StoreProductParams>,
   res: MedusaResponse<HttpTypes.StoreProductResponse>
 ) => {
   const withInventoryQuantity = req.remoteQueryConfig.fields.some((field) =>
