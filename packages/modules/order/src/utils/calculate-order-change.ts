@@ -1,6 +1,7 @@
 import { BigNumberInput, OrderSummaryDTO } from "@medusajs/framework/types"
 import {
   BigNumber,
+  ChangeActionType,
   MathBN,
   isPresent,
   transformPropertiesToBigNumber,
@@ -58,13 +59,10 @@ export class OrderChangeProcessing {
     let paid = MathBN.convert(0)
     let refunded = MathBN.convert(0)
     let transactionTotal = MathBN.convert(0)
-    // let pendingDifference = MathBN.convert(0)
     let creditLineTotal = (this.order.credit_lines || []).reduce(
       (acc, creditLine) => MathBN.add(acc, creditLine.amount),
       MathBN.convert(0)
     )
-
-    // pendingDifference = MathBN.sub(pendingDifference, creditLineTotal)
 
     for (const tr of transactions) {
       if (MathBN.lt(tr.amount, 0)) {
@@ -103,6 +101,11 @@ export class OrderChangeProcessing {
   }
 
   public processActions() {
+    let creditLineTotal = (this.order.credit_lines || []).reduce(
+      (acc, creditLine) => MathBN.add(acc, creditLine.amount),
+      MathBN.convert(0)
+    )
+
     for (const action of this.actions) {
       this.processAction_(action)
     }
@@ -129,28 +132,31 @@ export class OrderChangeProcessing {
         )
       }
 
-      if (!this.isEventDone(action) && !action.change_id) {
-        summary.difference_sum = MathBN.add(summary.difference_sum, amount)
+      if (action.action === ChangeActionType.CREDIT_LINE_ADD) {
+        creditLineTotal = MathBN.add(creditLineTotal, amount)
+      } else {
+        if (!this.isEventDone(action) && !action.change_id) {
+          summary.difference_sum = MathBN.add(summary.difference_sum, amount)
+        }
+
+        summary.current_order_total = MathBN.add(
+          summary.current_order_total,
+          amount
+        )
       }
-
-      const creditLineTotal = (this.order.credit_lines || []).reduce(
-        (acc, creditLine) => MathBN.add(acc, creditLine.amount),
-        MathBN.convert(0)
-      )
-
-      summary.credit_line_total = creditLineTotal
-      summary.current_order_total = MathBN.add(
-        summary.current_order_total,
-        amount
-      )
     }
 
     const groupSum = MathBN.add(...Object.values(this.groupTotal))
-
     summary.difference_sum = MathBN.add(summary.difference_sum, groupSum)
+    summary.credit_line_total = creditLineTotal
 
     summary.transaction_total = MathBN.sum(
       ...this.transactions.map((tr) => tr.amount)
+    )
+
+    summary.current_order_total = MathBN.sub(
+      summary.current_order_total,
+      creditLineTotal
     )
 
     summary.pending_difference = MathBN.sub(

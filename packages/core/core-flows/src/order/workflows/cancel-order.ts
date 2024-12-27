@@ -45,19 +45,6 @@ export const cancelValidateOrder = createStep(
 
     throwIfOrderIsCancelled({ order })
 
-    let refunds = 0
-
-    deepFlatMap(order_, "payment_collections.payments", ({ payments }) => {
-      refunds += payments?.refunds?.length ?? 0
-    })
-
-    if (refunds > 0) {
-      throw new MedusaError(
-        MedusaError.Types.NOT_ALLOWED,
-        "Order with payment refund(s) cannot be canceled"
-      )
-    }
-
     const throwErrorIf = (
       arr: unknown[],
       pred: (obj: any) => boolean,
@@ -178,10 +165,6 @@ export const cancelOrderWorkflow = createWorkflow(
     }).config({ name: "get-cart2" })
 
     const order2 = transform({ orderQuery2 }, ({ orderQuery2 }) => {
-      console.log(
-        "orderQuery2 - ",
-        JSON.stringify(orderQuery2.data[0].summary, null, 4)
-      )
       return orderQuery2.data[0]
     })
 
